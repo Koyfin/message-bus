@@ -1,0 +1,47 @@
+{
+  "name": "message-bus",
+  "version": "0.0.1",
+  "description": "Abstration for message bus",
+  "homepage": "https://github.com/Koyfin/message-bus#readme",
+  "bugs": {
+    "url": "https://github.com/Koyfin/message-bus/issues"
+  },
+  "license": "UNLICENSED",
+  "author": {
+    "name": "EzeTech",
+    "url": "http://eze.tech/"
+  },
+  "main": "src/app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Koyfin/message-bus.git"
+  },
+  "scripts": {
+    "check-shrinkwrap": "if (! git diff --cached  --quiet -- package.json); then echo 'Running `npm shrinkwrap` to match new package spec...' >&2; npm shrinkwrap; git add npm-shrinkwrap.json; fi",
+    "eslint": "eslint src/. test/.",
+    "postinstall": "cp bin/commit-msg .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg",
+    "start": "node src/app.js",
+    "test": "npm run eslint && npm run test:unit",
+    "test:unit": "mocha"
+  },
+  "dependencies": {
+    "amqplib": "0.5.1",
+    "bluebird": "3.4.7",
+    "bunyan": "^1.8.10"
+  },
+  "devDependencies": {
+    "chai": "3.5.0",
+    "eslint": "3.12.2",
+    "eslint-config-standard": "6.2.1",
+    "eslint-plugin-promise": "3.4.0",
+    "eslint-plugin-standard": "2.0.1",
+    "mocha": "3.2.0",
+    "pre-commit": "1.2.2"
+  },
+  "optionalDependencies": {
+    "fsevents": "*"
+  },
+  "pre-commit": [
+
+  ]
+}
