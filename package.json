@@ -17,31 +17,36 @@
     "url": "git+https://github.com/Koyfin/message-bus.git"
   },
   "scripts": {
-    "check-shrinkwrap": "if (! git diff --cached  --quiet -- package.json); then echo 'Running `npm shrinkwrap` to match new package spec...' >&2; npm shrinkwrap; git add npm-shrinkwrap.json; fi",
-    "eslint": "eslint src/. test/.",
-    "postinstall": "cp bin/commit-msg .git/hooks/commit-msg && chmod +x .git/hooks/commit-msg",
-    "start": "node src/app.js",
-    "test": "npm run eslint && npm run test:unit",
-    "test:unit": "mocha"
+    "start": "npm run build && npm run watch",
+    "build": "npm run build-ts && npm run tslint",
+    "test": "mocha --compilers ts:ts-node/register --recursive",
+    "build-ts": "tsc",
+    "watch": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
-    "amqplib": "0.5.1",
-    "bluebird": "3.4.7",
+    "amqplib": "^0.5.1",
+    "bluebird": "^3.5.0",
     "bunyan": "^1.8.10"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.5.1",
+    "@types/bluebird": "^3.5.4",
+    "@types/chai": "^3.5.2",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^7.0.22",
+    "@types/sinon": "^2.2.2",
     "chai": "3.5.0",
-    "eslint": "3.12.2",
-    "eslint-config-standard": "6.2.1",
-    "eslint-plugin-promise": "3.4.0",
-    "eslint-plugin-standard": "2.0.1",
     "mocha": "3.2.0",
-    "pre-commit": "1.2.2"
+    "pre-commit": "1.2.2",
+    "sinon": "^2.3.1",
+    "ts-node": "^3.0.4",
+    "tslint": "^5.3.2",
+    "tslint-config-standard": "^5.0.2",
+    "typescript": "^2.3.3"
   },
   "optionalDependencies": {
     "fsevents": "*"
   },
-  "pre-commit": [
-
-  ]
+  "pre-commit": []
 }
