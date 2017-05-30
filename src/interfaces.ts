@@ -45,7 +45,7 @@ const listener = bus
 setTimeout(() => listener.close(), 5000)
 
 // Will send single message
-const publish = bus.publisher('pubsub:topic:example').publish
-publish({status: 'OK'})
+bus.publisher('pubsub:topic:example')
+  .publish({status: 'OK'})
   .then(() => console.log('Sended'))
   .catch((error) => console.error(error))

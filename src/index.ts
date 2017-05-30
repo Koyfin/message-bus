@@ -1,5 +1,5 @@
 import {Bus} from './bus'
-import {RabbitMQAdapter} from './rabbitmq.adapter'
+import {RabbitMQAdapter} from './rabbitmq/rabbitMQAdapter'
 
 export {
   Bus,

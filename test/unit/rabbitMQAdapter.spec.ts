@@ -1,7 +1,7 @@
 import * as amqplib from 'amqplib'
 import {stub} from 'sinon'
 import {expect} from 'chai'
-import {RabbitMQAdapter} from '../../src/rabbitmq.adapter'
+import {RabbitMQAdapter} from '../../src/rabbitmq/rabbitMQAdapter'
 
 describe('RabbitMQAdapter', function () {
 

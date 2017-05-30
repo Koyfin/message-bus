@@ -1,32 +1,36 @@
 import {stub} from 'sinon'
 import {expect} from 'chai'
-import {Bus, Adapter} from '../../src/bus'
+import {Bus} from '../../src/bus'
+import PublisherBuilder from '../../src/publisherBuilder'
 
 describe('bus', function () {
 
-  class FakeAdapter implements Adapter {
-
-    public connect
-    public disconnect
-    public publisher
-    public subscriber
-
-    constructor () {
-      this.connect = stub().resolves()
-      this.disconnect = stub().resolves()
-      this.publisher = stub().resolves()
-      this.subscriber = stub().resolves()
-    }
-
-  }
-
   it('should connect and disconnect', async function () {
-    const adapter = new FakeAdapter()
-    const bus = new Bus({}, adapter)
+    const adapter = getAdapter()
+    const bus = new Bus(adapter)
     await bus.connect()
     await bus.disconnect()
     expect(adapter.connect.calledOnce).eq(true)
     expect(adapter.disconnect.calledOnce).eq(true)
   })
 
+  it('publisher should create publisher', async function () {
+    const topic = 'test_topic'
+    const adapter = getAdapter()
+    const bus = new Bus(adapter)
+    await bus.connect()
+
+    const publisher = await bus.publisher(topic)
+
+    expect(publisher instanceof PublisherBuilder).eq(true)
+  })
+
 })
+
+function getAdapter () {
+  return {
+    connect: stub().resolves(),
+    disconnect: stub().resolves(),
+    publish: stub().resolves(),
+  }
+}
