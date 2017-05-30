@@ -7,7 +7,7 @@ interface RabbitMQOptions {
   url: string
 }
 
-export class RabbitMQAdapter implements Adapter {
+export class RabbitMQAdapter extends EventEmitter implements Adapter {
 
   private static REPLY_QUEUE = 'amq.rabbitmq.reply-to'
   private static RESPONSE_TIMEOUT = 1000
@@ -17,6 +17,10 @@ export class RabbitMQAdapter implements Adapter {
   private options: RabbitMQOptions
   private responseEmitter: EventEmitter
 
+  constructor () {
+    super()
+  }
+
   private static getMessageContent (msg) {
     return JSON.parse(msg.content.toString())
   }
@@ -25,14 +29,14 @@ export class RabbitMQAdapter implements Adapter {
     this.options = options
     this.connection = await amqplib.connect(this.options.url)
     this.channel = await this.connection.createChannel()
-    await this.setupRPC()
+    await this.setupReplyQueue()
   }
 
   async disconnect () {
     await this.connection.close()
   }
 
-  setupRPC () {
+  setupReplyQueue () {
     this.responseEmitter = new EventEmitter()
     this.responseEmitter.setMaxListeners(0)
     return this.channel.consume(RabbitMQAdapter.REPLY_QUEUE,
@@ -48,13 +52,22 @@ export class RabbitMQAdapter implements Adapter {
 
   async listen (queue, handler) {
     return this.channel.consume(queue, (msg) => {
-      const content = RabbitMQAdapter.getMessageContent(msg)
-      handler(msg, content, (msg) => this.ack(msg))
+      try {
+        const content = RabbitMQAdapter.getMessageContent(msg)
+        handler(msg, content, (msg) => this.ack(msg))
+      } catch (error) {
+        this.nack(msg)
+        this.emit('error', error)
+      }
     })
   }
 
   ack (msg) {
     return this.channel.ack(msg)
+  }
+
+  nack (msg) {
+    return this.channel.nack(msg, false, false)
   }
 
   request (options) {
@@ -73,8 +86,12 @@ export class RabbitMQAdapter implements Adapter {
         return resolve({msg, content})
       })
 
-      this.channel.publish(exchange, key, new Buffer(message), {correlationId, replyTo: RabbitMQAdapter.REPLY_QUEUE})
+      this.channel.publish(exchange, key, Buffer.from(JSON.stringify(message)), {correlationId, replyTo: RabbitMQAdapter.REPLY_QUEUE})
     })
   }
 
+  async respond (res, msg) {
+    const {replyTo, correlationId} = msg.properties
+    return this.channel.publish('', replyTo, Buffer.from(JSON.stringify(res)), {correlationId})
+  }
 }

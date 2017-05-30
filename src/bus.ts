@@ -1,16 +1,23 @@
 import PublisherBuilder from './publisherBuilder'
 import {Adapter} from './types'
 import SubscriberBuilder from './subscriberBuilder'
-import RequesterBuilder from "./requesterBuilder";
+import RequesterBuilder from './requesterBuilder'
+import ResponderBuilder from './responderBuilder'
+import {EventEmitter} from 'events'
 
-export class Bus {
+export class Bus extends EventEmitter {
 
   private adapter: Adapter
   private options: object
 
   constructor (options, adapter: Adapter) {
+    super()
     this.options = options
     this.adapter = adapter
+
+    this.adapter.on('error', (error) => {
+      this.emit('error', error)
+    })
   }
 
   connect () {
@@ -33,6 +40,10 @@ export class Bus {
     return new RequesterBuilder(this, key, ex)
   }
 
+  responder (key) {
+    return new ResponderBuilder(this, key)
+  }
+
   publish (key, exchange, message) {
     return this.adapter.publish(key, exchange, message)
   }
@@ -43,5 +54,17 @@ export class Bus {
 
   request (options) {
     return this.adapter.request(options)
+  }
+
+  respond (res, msg) {
+    return this.adapter.respond(res, msg)
+  }
+
+  ack (msg) {
+    return this.adapter.ack(msg)
+  }
+
+  nack (msg) {
+    return this.adapter.nack(msg)
   }
 }
