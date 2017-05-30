@@ -29,7 +29,7 @@ export default class PublisherBuilder {
 
   }
 
-  async publish (message) {
+  publish (message) {
     return this.bus.publish(this._key, this._exchange, message)
   }
 

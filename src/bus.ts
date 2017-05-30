@@ -1,6 +1,7 @@
 import PublisherBuilder from './publisherBuilder'
 import {Adapter} from './types'
 import SubscriberBuilder from './subscriberBuilder'
+import RequesterBuilder from "./requesterBuilder";
 
 export class Bus {
 
@@ -28,11 +29,19 @@ export class Bus {
     return new SubscriberBuilder(this, key)
   }
 
+  requester (key, ex = '') {
+    return new RequesterBuilder(this, key, ex)
+  }
+
   publish (key, exchange, message) {
     return this.adapter.publish(key, exchange, message)
   }
 
-  consume (key, handler) {
-    return this.adapter.consume(key, handler)
+  listen (key, handler) {
+    return this.adapter.listen(key, handler)
+  }
+
+  request (options) {
+    return this.adapter.request(options)
   }
 }

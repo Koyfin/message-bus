@@ -3,18 +3,26 @@ import {Bus} from './bus'
 export default class SubscriberBuilder {
 
   private bus: Bus
-  private key: string
-  // private onMessageHandler: any
-  // private onErrorHandler: any
+  private _key: string
+  private handler: (msg, done, originalMsg) => void
 
   constructor (bus, key) {
     this.bus = bus
-    this.key = key
-    // this.onMessageHandler = null
-    // this.onErrorHandler = () => {}
+    this._key = key
   }
 
-  consume (key, handler) {
-    return this.bus.consume(key, handler)
+  key (key) {
+    if (key === undefined) return this._key
+    this._key = key
   }
+
+  onMessage (handler: (msg, ack, originalMsg) => void) {
+    this.handler = handler
+    return this
+  }
+
+  listen () {
+    return this.bus.listen(this._key, this.handler)
+  }
+
 }
