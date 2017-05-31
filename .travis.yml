@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+- 6.10.0
+script:
+- npm test
+cache:
+  directories:
+  - node_modules
+install:
+- npm install --no-optional
+services:
+- rabbitmq
+env:
+  global:
+  - NODE_ENV="test"
+  - BUS_URL="amqp://localhost:5672"
+notifications:
+  slack:
+    secure: Jihck4Gk/yRHWjSQQfA7MpruNSdXm+7+lVy511XL5hZ8Ygp6D8iCep8U+wEirfRQH2OzMaW6IRPxZhkRQJuMQuXwgrkMUxYena1nOWN6V/YQFFWeY43K3AskluCn8dsPFJSvoVrukqL3o3hoBoHofx1O6t0yCbVGLlY16uiedRYUCsJ5KvCtr2wX9XVn5yFtls6xuLBd0fTVIaNgJ/h/12/g7YJk/Xuxe6NoheOO7GLDW5/X0zV658FhisijW5hu9R6tcw6OWavsSXIfva/ojyJ2ojwxxfYOemfRkWQaldJrkc7RzHq0yJ1OiRAB+a087+Hf3GMuQdKaset1wadwhBhHITh2eukLpj5m/nh4PrNUBBE0Q8ZTSDJDiDxE/qR4/D80yltqlCl/qHGbETNWu9QGOveeJ5IPDP4nkvpQUZl5OMjEB6IxQBOU4t0V4p3zPDegY4u+jSH7vkSPJruWvfmHMXJiFd/0Ismu/ZJlAYPs4qwtXg56r+xjT4nn6/EdG62iUnmefYuZHKq0biiwzkRitMJFrq0clHYKgWWGL+NfecCr5HyMaa8p6cCC6EJkPI2tErQAc9UFna88Tsw2kVck0Iu9VM+hvy9xg0KzJ8IbgbSF3F79ks37yHZ6dmr9j9TGsUMubW1ngepyq0BjdpVMBTCohdqPT6dExKE+UI4=
