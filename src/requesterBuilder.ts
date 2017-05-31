@@ -2,6 +2,7 @@ import {Bus} from './bus'
 
 export default class RequesterBuilder {
 
+  private static DEFAULT_TIMEOUT = 1000
   private bus: Bus
   private _key: string
   private _exchange: string
@@ -11,21 +12,28 @@ export default class RequesterBuilder {
     this.bus = bus
     this._key = key
     this._exchange = ex
+    this._timeout = RequesterBuilder.DEFAULT_TIMEOUT
   }
 
-  exchange (ex) {
-    if (ex === undefined) return this._exchange
-    this._exchange = ex
+  exchange (): string
+  exchange (exchange: string): this
+  exchange (exchange?) {
+    if (exchange === undefined) return this._exchange
+    this._exchange = exchange
     return this
   }
 
-  key (key) {
+  key (): string
+  key (key: string): this
+  key (key?) {
     if (key === undefined) return this._key
     this._key = key
     return this
   }
 
-  timeout (timeout) {
+  timeout (): number
+  timeout (timeout: number): this
+  timeout (timeout?) {
     if (timeout === undefined) return this._timeout
     this._timeout = timeout
     return this

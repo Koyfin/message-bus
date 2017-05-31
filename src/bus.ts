@@ -28,7 +28,7 @@ export class Bus extends EventEmitter {
     return this.adapter.disconnect()
   }
 
-  publisher (key, ex = '') {
+  publisher (key = '', ex = '') {
     return new PublisherBuilder(this, key, ex)
   }
 
@@ -48,8 +48,8 @@ export class Bus extends EventEmitter {
     return this.adapter.publish(key, exchange, message)
   }
 
-  listen (key, handler) {
-    return this.adapter.listen(key, handler)
+  listen (key, handler, noAck) {
+    return this.adapter.listen(key, handler, noAck)
   }
 
   request (options) {

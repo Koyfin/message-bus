@@ -1,0 +1,21 @@
+version: '3'
+services:
+  message-bus:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    entrypoint:
+      - npm
+      - test
+    volumes:
+      - .:/app
+    links:
+      - rabbitmq
+    depends_on:
+      - "rabbitmq"
+    environment:
+      BUS_URL: "amqp://rabbitmq:5672"
+  rabbitmq:
+    image: "rabbitmq:3.6-alpine"
+    ports:
+     - "5672:5672"

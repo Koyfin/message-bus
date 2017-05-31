@@ -6,22 +6,26 @@ export default class PublisherBuilder {
   private _key: string
   private _exchange: string
 
-  constructor (bus, key, ex = '') {
+  constructor (bus, key, ex) {
     this.bus = bus
     this._key = key
     this._exchange = ex
   }
 
-  exchange (ex) {
+  exchange (): string
+  exchange (exchange: string): this
+  exchange (exchange?) {
 
-    if (ex === undefined) return this._exchange
+    if (exchange === undefined) return this._exchange
 
-    this._exchange = ex
+    this._exchange = exchange
     return this
 
   }
 
-  key (key) {
+  key (): string
+  key (key: string): this
+  key (key?) {
     if (key === undefined) return key
 
     this._key = key

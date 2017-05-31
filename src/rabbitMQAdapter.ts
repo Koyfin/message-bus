@@ -40,26 +40,29 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
     this.responseEmitter = new EventEmitter()
     this.responseEmitter.setMaxListeners(0)
     return this.channel.consume(RabbitMQAdapter.REPLY_QUEUE,
-      (msg) => this.responseEmitter.emit(msg.properties.correlationId, msg.content),
+      (msg) => this.responseEmitter.emit(msg.properties.correlationId, msg),
       {noAck: true})
   }
 
   async publish (key, exchange, message) {
+    if (!key && !exchange) {
+      throw new Error(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
+    }
     const content = Buffer.from(JSON.stringify(message))
-    console.log(key, exchange, message)
     return this.channel.publish(exchange, key, content)
   }
 
-  async listen (queue, handler) {
+  async listen (queue, handler, noAck) {
+    const options = {noAck}
     return this.channel.consume(queue, (msg) => {
       try {
         const content = RabbitMQAdapter.getMessageContent(msg)
-        handler(msg, content, (msg) => this.ack(msg))
+        handler(msg, content)
       } catch (error) {
         this.nack(msg)
         this.emit('error', error)
       }
-    })
+    }, options)
   }
 
   ack (msg) {
@@ -73,6 +76,9 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
   request (options) {
     const {key, exchange, message} = options
     const timeout = options.timeout || RabbitMQAdapter.RESPONSE_TIMEOUT
+    if (!key && !exchange) {
+      return Promise.reject(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
+    }
     return new Promise((resolve, reject) => {
       const correlationId = uuid.v4()
       const timeoutId = setTimeout(() => {
@@ -86,7 +92,10 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
         return resolve({msg, content})
       })
 
-      this.channel.publish(exchange, key, Buffer.from(JSON.stringify(message)), {correlationId, replyTo: RabbitMQAdapter.REPLY_QUEUE})
+      this.channel.publish(exchange, key, Buffer.from(JSON.stringify(message)), {
+        correlationId,
+        replyTo: RabbitMQAdapter.REPLY_QUEUE,
+      })
     })
   }
 

@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+- 6.10.0
+script:
+- npm test
+cache:
+  directories:
+  - node_modules
+install:
+- npm install --no-optional
+services:
+- rabbitmq
+env:
+  global:
+  - NODE_ENV="test"
+  - BUS_URL="amqp://localhost:5672"

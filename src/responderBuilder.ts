@@ -4,7 +4,7 @@ export default class ResponderBuilder {
 
   private bus: Bus
   private _key: string
-  private handler: (msg, respond) => any
+  private handler: (msg, content, respond) => any
   private errorHandler: (error) => any
 
   constructor (bus, key) {
@@ -12,9 +12,12 @@ export default class ResponderBuilder {
     this._key = key
   }
 
-  key (key) {
+  key (): string
+  key (key: string): this
+  key (key?) {
     if (key === undefined) return this._key
     this._key = key
+    return this
   }
 
   onRequest (handler) {
@@ -28,16 +31,16 @@ export default class ResponderBuilder {
   }
 
   listen () {
-    return this.bus.listen(this._key, (msg, content) => this.handleRequest(msg, content))
+    return this.bus.listen(this._key, (msg, content) => this.handleRequest(msg, content), false)
   }
 
-  handleRequest (msg, content) {
-    this.handler(content, (res) => {
-      this.respond(res, msg)
+  private handleRequest (msg, content) {
+    this.handler(msg, content, (res) => {
+      return this.respond(res, msg)
     })
   }
 
-  respond (res, msg) {
+  private respond (res, msg) {
     return this.bus.respond(res, msg)
   }
 

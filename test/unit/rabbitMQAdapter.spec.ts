@@ -6,9 +6,14 @@ import {RabbitMQAdapter} from '../../src/rabbitMQAdapter'
 describe('RabbitMQAdapter', function () {
 
   let connection
+  let channel
+
   before('stub amqplib', function () {
+    channel = {
+      consume: stub(),
+    }
     connection = {
-      createChannel: stub().resolves({}),
+      createChannel: stub().resolves(channel),
       close: stub().resolves(),
     }
     stub(amqplib, 'connect').resolves(connection)

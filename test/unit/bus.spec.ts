@@ -3,6 +3,7 @@ import {expect} from 'chai'
 import {Bus} from '../../src/bus'
 import PublisherBuilder from '../../src/publisherBuilder'
 import SubscriberBuilder from '../../src/subscriberBuilder'
+import {EventEmitter} from 'events'
 
 describe('bus', function () {
 
@@ -40,10 +41,21 @@ describe('bus', function () {
 })
 
 function getAdapter () {
-  return {
-    connect: stub().resolves(),
-    disconnect: stub().resolves(),
-    publish: stub().resolves(),
-    consume: stub(),
+  return new FakeAdapter()
+}
+
+class FakeAdapter extends EventEmitter {
+
+  connect = stub().resolves()
+  disconnect = stub().resolves()
+  publish = stub().resolves()
+  listen = stub().resolves()
+  ack = stub()
+  nack = stub()
+  request = stub().resolves()
+  respond = stub().resolves()
+
+  constructor () {
+    super()
   }
 }
