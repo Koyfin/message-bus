@@ -10,10 +10,10 @@ export class Bus extends EventEmitter {
   private adapter: Adapter
   private options: object
 
-  constructor (options, adapter: Adapter) {
+  constructor (options: {url: string, adapter: Adapter}) {
     super()
     this.options = options
-    this.adapter = adapter
+    this.adapter = options.adapter
 
     this.adapter.on('error', (error) => {
       this.emit('error', error)

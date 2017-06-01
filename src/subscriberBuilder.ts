@@ -1,4 +1,5 @@
 import {Bus} from './bus'
+import {SubscribeHandler} from './types'
 
 export default class SubscriberBuilder {
 
@@ -29,7 +30,7 @@ export default class SubscriberBuilder {
     return this
   }
 
-  onMessage (handler) {
+  onMessage (handler: SubscribeHandler) {
     this.handler = handler
     return this
   }

@@ -11,6 +11,14 @@ export interface Adapter extends EventEmitter {
   respond (res, msg): Promise<boolean>
 }
 
+export interface SubscribeHandler {
+  (msg: any, content: object): any
+}
+
+export interface ResponseHandler {
+  (msg: any, content: object, respond: (response: object) => Promise<boolean>): any
+}
+
 interface ListenHandler {
-  (msg: any, content: object, ack): any
+  (msg: any, content: object, noAck: boolean): any
 }

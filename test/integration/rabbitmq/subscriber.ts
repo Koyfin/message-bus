@@ -7,7 +7,7 @@ describe('subscriber', function () {
 
   const url = process.env.BUS_URL || 'amqp://localhost:5672'
   const adapter = new RabbitMQAdapter()
-  const bus = new Bus({url}, adapter)
+  const bus = new Bus({url, adapter})
 
   let ch: amqp.Channel
   let conn: amqp.Connection

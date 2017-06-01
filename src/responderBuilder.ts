@@ -1,4 +1,5 @@
 import {Bus} from './bus'
+import {ResponseHandler} from './types'
 
 export default class ResponderBuilder {
 
@@ -20,7 +21,7 @@ export default class ResponderBuilder {
     return this
   }
 
-  onRequest (handler) {
+  onRequest (handler: ResponseHandler) {
     this.handler = handler
     return this
   }
@@ -35,9 +36,7 @@ export default class ResponderBuilder {
   }
 
   private handleRequest (msg, content) {
-    this.handler(msg, content, (res) => {
-      return this.respond(res, msg)
-    })
+    this.handler(msg, content, (res) => this.respond(res, msg))
   }
 
   private respond (res, msg) {

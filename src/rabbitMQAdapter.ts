@@ -10,7 +10,6 @@ interface RabbitMQOptions {
 export class RabbitMQAdapter extends EventEmitter implements Adapter {
 
   private static REPLY_QUEUE = 'amq.rabbitmq.reply-to'
-  private static RESPONSE_TIMEOUT = 1000
 
   private connection: amqplib.Connection
   private channel: amqplib.Channel
@@ -36,7 +35,7 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
     await this.connection.close()
   }
 
-  setupReplyQueue () {
+  async setupReplyQueue () {
     this.responseEmitter = new EventEmitter()
     this.responseEmitter.setMaxListeners(0)
     return this.channel.consume(RabbitMQAdapter.REPLY_QUEUE,
@@ -75,7 +74,7 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
 
   request (options) {
     const {key, exchange, message} = options
-    const timeout = options.timeout || RabbitMQAdapter.RESPONSE_TIMEOUT
+    const timeout = options.timeout
     if (!key && !exchange) {
       return Promise.reject(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
     }

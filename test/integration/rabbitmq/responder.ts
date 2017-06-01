@@ -7,7 +7,7 @@ describe('responder', function () {
 
   const url = process.env.BUS_URL || 'amqp://localhost:5672'
   const adapter = new RabbitMQAdapter()
-  const bus = new Bus({url}, adapter)
+  const bus = new Bus({url, adapter})
   const responderQueue = 'responderQueue'
   const requesterQueue = 'requesterQueue'
 

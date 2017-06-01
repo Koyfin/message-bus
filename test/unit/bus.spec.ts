@@ -9,7 +9,7 @@ describe('bus', function () {
 
   it('should connect and disconnect', async function () {
     const adapter = getAdapter()
-    const bus = new Bus({}, adapter)
+    const bus = new Bus({url: 'some', adapter})
     await bus.connect()
     await bus.disconnect()
     expect(adapter.connect.calledOnce).eq(true)
@@ -19,7 +19,7 @@ describe('bus', function () {
   it('publisher should create publisher', async function () {
     const topic = 'test_topic'
     const adapter = getAdapter()
-    const bus = new Bus({}, adapter)
+    const bus = new Bus({url: 'some', adapter})
     await bus.connect()
 
     const publisher = await bus.publisher(topic)
@@ -30,7 +30,7 @@ describe('bus', function () {
   it('subscriber should create subscriberBuilder', async function () {
     const topic = 'test_topic'
     const adapter = getAdapter()
-    const bus = new Bus({}, adapter)
+    const bus = new Bus({url: 'some', adapter})
     await bus.connect()
 
     const publisher = await bus.subscriber(topic)
