@@ -2,6 +2,7 @@ import * as uuid from 'uuid'
 import * as amqplib from 'amqplib'
 import {EventEmitter} from 'events'
 import {Adapter} from './types'
+import {Replies} from '@types/amqplib'
 
 interface RabbitMQOptions {
   url: string
@@ -33,14 +34,6 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
 
   async disconnect () {
     await this.connection.close()
-  }
-
-  async setupReplyQueue () {
-    this.responseEmitter = new EventEmitter()
-    this.responseEmitter.setMaxListeners(0)
-    return this.channel.consume(RabbitMQAdapter.REPLY_QUEUE,
-      (msg) => this.responseEmitter.emit(msg.properties.correlationId, msg),
-      {noAck: true})
   }
 
   async publish (key, exchange, message) {
@@ -102,4 +95,13 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
     const {replyTo, correlationId} = msg.properties
     return this.channel.publish('', replyTo, Buffer.from(JSON.stringify(res)), {correlationId})
   }
+
+  private async setupReplyQueue () {
+    this.responseEmitter = new EventEmitter()
+    this.responseEmitter.setMaxListeners(0)
+    return this.channel.consume(RabbitMQAdapter.REPLY_QUEUE,
+      (msg) => this.responseEmitter.emit(msg.properties.correlationId, msg),
+      {noAck: true})
+  }
+
 }

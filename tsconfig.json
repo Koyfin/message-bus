@@ -2,9 +2,13 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "sourceMap": true,
-    "outDir": "lib"
+    "outDir": "lib",
+    "declaration": true
   },
   "files": [
     "src/index.ts"
+  ],
+  "exclude": [
+    "lib"
   ]
 }

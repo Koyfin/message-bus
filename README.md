@@ -1,7 +1,7 @@
-#message-bus
+# message-bus
 Abstraction layer for message bus with pub-sub and RPC patterns implemented
 
-##pub-sub example
+## pub-sub example
 ```ecmascript 6
 const {Bus, RabbitMQAdapter} = require('message-bus')
 
@@ -25,7 +25,7 @@ bus.connect()
   })
 ```
 
-##req-res example
+## req-res example
 ```ecmascript 6
 const {Bus, RabbitMQAdapter} = require('message-bus')
 

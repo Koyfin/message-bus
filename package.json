@@ -18,6 +18,7 @@
     "lib": "./lib"
   },
   "main": "src/index.js",
+  "types": "lib/index",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Koyfin/message-bus.git"
