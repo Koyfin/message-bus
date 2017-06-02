@@ -1,7 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
 import { Adapter } from './types';
-import { Replies } from '@types/amqplib';
 export declare class RabbitMQAdapter extends EventEmitter implements Adapter {
     private static REPLY_QUEUE;
     private connection;
@@ -13,7 +12,8 @@ export declare class RabbitMQAdapter extends EventEmitter implements Adapter {
     connect(options: any): Promise<void>;
     disconnect(): Promise<void>;
     publish(key: any, exchange: any, message: any): Promise<boolean>;
-    listen(queue: any, handler: any, noAck: any): Promise<Replies.Consume>;
+    subscribe(queue: any, eventEmitter: any, noAck: any): Promise<string>;
+    unsubscribe(consumerTag: string): Promise<void>;
     ack(msg: any): void;
     nack(msg: any): void;
     request(options: any): Promise<never>;

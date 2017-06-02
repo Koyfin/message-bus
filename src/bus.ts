@@ -36,6 +36,10 @@ export class Bus extends EventEmitter {
     return new SubscriberBuilder(this, key)
   }
 
+  unsubscribe (subscriptionId: string) {
+    return this.adapter.unsubscribe(subscriptionId)
+  }
+
   requester (key, ex = '') {
     return new RequesterBuilder(this, key, ex)
   }
@@ -48,8 +52,8 @@ export class Bus extends EventEmitter {
     return this.adapter.publish(key, exchange, message)
   }
 
-  listen (key, handler, noAck) {
-    return this.adapter.listen(key, handler, noAck)
+  subscribe (key, eventEmitter, noAck) {
+    return this.adapter.subscribe(key, eventEmitter, noAck)
   }
 
   request (options) {

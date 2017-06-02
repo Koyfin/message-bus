@@ -27,6 +27,7 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
 
   async connect (options) {
     this.options = options
+    //noinspection TsLint
     this.connection = await amqplib.connect(this.options.url)
     this.channel = await this.connection.createChannel()
     await this.setupReplyQueue()
@@ -44,17 +45,22 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
     return this.channel.publish(exchange, key, content)
   }
 
-  async listen (queue, handler, noAck) {
+  async subscribe (queue, eventEmitter, noAck) {
     const options = {noAck}
-    return this.channel.consume(queue, (msg) => {
+    const {consumerTag} = await this.channel.consume(queue, (msg) => {
       try {
         const content = RabbitMQAdapter.getMessageContent(msg)
-        handler(msg, content)
+        eventEmitter.emit('msg', {msg, content})
       } catch (error) {
         this.nack(msg)
-        this.emit('error', error)
+        eventEmitter.emit('error', error)
       }
     }, options)
+    return consumerTag
+  }
+
+  async unsubscribe (consumerTag: string) {
+    await this.channel.cancel(consumerTag)
   }
 
   ack (msg) {

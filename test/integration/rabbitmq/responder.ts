@@ -2,6 +2,7 @@ import {Bus, RabbitMQAdapter} from '../../../src'
 import * as Bluebird from 'bluebird'
 import {expect} from 'chai'
 import * as amqp from 'amqplib'
+import ResponderBuilder from '../../../src/responderBuilder'
 
 describe('responder', function () {
 
@@ -11,9 +12,11 @@ describe('responder', function () {
   const responderQueue = 'responderQueue'
   const requesterQueue = 'requesterQueue'
 
-  let handler = (msg): any => {
+  let defaultHandler = (msg): any => {
     throw new Error('replace default handler!')
   }
+  let handler: (msg) => any
+  let responder: ResponderBuilder
   let ch: amqp.Channel
   let conn: amqp.Connection
 
@@ -52,11 +55,19 @@ describe('responder', function () {
     return conn.close()
   })
 
+  beforeEach('assign default handler', function () {
+    handler = defaultHandler
+  })
+
+  afterEach('unsubscribe', function () {
+    return responder.unsubscribe()
+  })
+
   it('responder should respond with request msg', function (done) {
     const replyTo = requesterQueue
     const correlationId = 'correlationId'
     const testContent = {test: 'val'}
-    const responder = bus.responder(responderQueue)
+    responder = bus.responder(responderQueue)
 
     handler = (msg) => {
       const content = JSON.parse(msg.content.toString())
@@ -64,15 +75,38 @@ describe('responder', function () {
       done()
     }
 
-    responder.onRequest((msg, content, respond) => {
-      respond(content)
-    }).listen().then(() => {
-      return ch.publish('', responderQueue, Buffer.from(JSON.stringify(testContent)), {
-        replyTo,
-        correlationId,
+    responder
+      .onRequest((msg, content, respond) => {
+        return respond(content)
       })
-    })
+      .subscribe()
+      .then(() => {
+        return ch.publish('', responderQueue, Buffer.from(JSON.stringify(testContent)), {
+          replyTo,
+          correlationId,
+        })
+      })
 
+  })
+
+  it('subscriber should produce error if onRequest handler not set', function (done) {
+    responder = bus.responder('test')
+    responder
+      .onError(() => done())
+      .subscribe()
+      .then(() => ch.publish('', 'test', Buffer.from(JSON.stringify({}))))
+      .catch(() => done())
+  })
+
+  it('subscriber should call onError handler if invalid message received', function (done) {
+    responder = bus.responder('test')
+    //noinspection TsLint
+    responder
+      .onRequest(() => {})
+      .onError(() => done())
+      .subscribe()
+      .then(() => ch.publish('', 'test', Buffer.from('invalid json')))
+      .catch(done)
   })
 
 })

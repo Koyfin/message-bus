@@ -12,14 +12,16 @@ const bus = new Bus({url, adapter})
 const publisher = bus.publisher(key)
 const subscriber = bus.subscriber(key)
 
-subscriber.onMessage((msg, content) => {
-  console.log(msg) // raw message
-  console.log(content) // parsed message content
-  bus.ack(msg)
-})
+subscriber
+    .onMessage((msg, content) => {
+      console.log(msg) // raw message
+      console.log(content) // parsed message content
+      bus.ack(msg)
+    })
+    .onError(error => console.error(error))
 
 bus.connect()
-  .then(() => subscriber.listen())
+  .then(() => subscriber.subscribe())
   .then(() => {
     setInterval(() => publisher.publish({any: 'object'}), 2000)
   })
@@ -36,19 +38,21 @@ const bus = new Bus({url, adapter})
 const requester = bus.requester(key)
 const responder = bus.responder(key)
 
-responder.onRequest((msg, content, respond) => {
-  console.log('responding on ', content) // parsed message content
-  respond(msg)
-})
-
+responder
+    .onRequest((msg, content, respond) => {
+      console.log('responding on ', content) // parsed message content
+      return respond(msg)
+    })
+    .onError(error => console.error(error))
+    
 bus.connect()
-  .then(() => responder.listen())
+  .then(() => responder.subscribe())
   .then(() => {
     setInterval(() => requester.request({any: 'object'}), 2000)
   })
 ```
 
-##error handling
+##bus error handling
 ```ecmascript 6
 bus.on('error', (error) => console.error('error'))
 ```

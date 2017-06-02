@@ -4,11 +4,17 @@ export default class SubscriberBuilder {
     private _key;
     private _noAck;
     private handler;
+    private errorHandler;
+    private eventEmitter;
+    private subscriptionId;
     constructor(bus: any, key: any);
     key(): string;
     key(key: string): this;
     noAck(): boolean;
     noAck(noAck: boolean): this;
     onMessage(handler: SubscribeHandler): this;
-    listen(): Promise<any>;
+    onError(handler: any): this;
+    subscribe(): Promise<void>;
+    unsubscribe(): Promise<void>;
+    private createEventEmitter();
 }

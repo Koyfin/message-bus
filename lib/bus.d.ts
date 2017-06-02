@@ -16,10 +16,11 @@ export declare class Bus extends EventEmitter {
     disconnect(): Promise<void>;
     publisher(key?: string, ex?: string): PublisherBuilder;
     subscriber(key: any): SubscriberBuilder;
+    unsubscribe(subscriptionId: string): Promise<void>;
     requester(key: any, ex?: string): RequesterBuilder;
     responder(key: any): ResponderBuilder;
     publish(key: any, exchange: any, message: any): Promise<any>;
-    listen(key: any, handler: any, noAck: any): Promise<any>;
+    subscribe(key: any, eventEmitter: any, noAck: any): Promise<any>;
     request(options: any): Promise<any>;
     respond(res: any, msg: any): Promise<boolean>;
     ack(msg: any): void;
