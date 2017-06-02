@@ -1,3 +1,4 @@
 import { Bus } from './bus';
 import { RabbitMQAdapter } from './rabbitMQAdapter';
-export { Bus, RabbitMQAdapter };
+import { Events } from './events';
+export { Bus, RabbitMQAdapter, Events };

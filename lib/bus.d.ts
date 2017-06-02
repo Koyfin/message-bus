@@ -4,7 +4,6 @@ import { Adapter } from './types';
 import SubscriberBuilder from './subscriberBuilder';
 import RequesterBuilder from './requesterBuilder';
 import ResponderBuilder from './responderBuilder';
-import { EventEmitter } from 'events';
 export declare class Bus {
     private adapter;
     private options;
@@ -20,7 +19,7 @@ export declare class Bus {
     requester(key: any, ex?: string): RequesterBuilder;
     responder(key: any): ResponderBuilder;
     publish(key: any, exchange: any, message: any): Promise<any>;
-    subscribe(key: any, eventEmitter: EventEmitter, noAck: any): Promise<any>;
+    subscribe(key: any, eventEmitter: NodeJS.EventEmitter, noAck: any): Promise<any>;
     request(options: any): Promise<any>;
     respond(res: any, msg: any): Promise<boolean>;
     ack(msg: any): void;

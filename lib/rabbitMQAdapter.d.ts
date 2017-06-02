@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Adapter } from './types';
 export declare class RabbitMQAdapter implements Adapter {
     private static REPLY_QUEUE;
@@ -9,7 +10,7 @@ export declare class RabbitMQAdapter implements Adapter {
     connect(options: any): Promise<void>;
     disconnect(): Promise<void>;
     publish(key: any, exchange: any, message: any): Promise<boolean>;
-    subscribe(queue: any, eventEmitter: any, noAck: any): Promise<string>;
+    subscribe(queue: any, eventEmitter: NodeJS.EventEmitter, noAck: any): Promise<string>;
     unsubscribe(consumerTag: string): Promise<void>;
     ack(msg: any): void;
     nack(msg: any): void;
