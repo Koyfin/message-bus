@@ -1,14 +1,16 @@
-import {Bus, RabbitMQAdapter} from '../../../src'
+import {Bus, RabbitMQAdapter, Events} from '../../../src'
 import * as Bluebird from 'bluebird'
 import {expect} from 'chai'
 import * as amqp from 'amqplib'
+import SubscriberBuilder from '../../../src/subscriberBuilder'
 
 describe('subscriber', function () {
 
   const url = process.env.BUS_URL || 'amqp://localhost:5672'
   const adapter = new RabbitMQAdapter()
-  const bus = new Bus({url}, adapter)
+  const bus = new Bus({url, adapter})
 
+  let subscriber: SubscriberBuilder
   let ch: amqp.Channel
   let conn: amqp.Connection
 
@@ -44,17 +46,33 @@ describe('subscriber', function () {
     return conn.close()
   })
 
-  it('subscriber should receive published msg', function (done) {
-    const subscriber = bus.subscriber('test')
-    const testContent = {test: 'val'}
-    subscriber.onMessage((msg, content) => {
-      expect(content).to.eql(testContent)
-      bus.ack(msg)
-      done()
-    }).listen().then(() => {
-      return ch.publish('', 'test', Buffer.from(JSON.stringify(testContent)))
-    })
+  afterEach('destroy subscriber', function () {
+    return subscriber.unsubscribe()
+  })
 
+  it('subscriber should receive published msg', function (done) {
+    subscriber = bus.subscriber('test')
+    const testContent = {test: 'val'}
+    subscriber
+      .on(Events.MESSAGE, (message, content) => {
+        expect(content).to.eql(testContent)
+        bus.ack(message)
+        done()
+      })
+      .subscribe()
+      .then(() => {
+        return ch.publish('', 'test', Buffer.from(JSON.stringify(testContent)))
+      })
+
+  })
+
+  it('subscriber should call onError handler if invalid message received', function (done) {
+    subscriber = bus.subscriber('test')
+    subscriber
+      .on(Events.ERROR, () => done())
+      .subscribe()
+      .then(() => ch.publish('', 'test', Buffer.from('invalid json')))
+      .catch(done)
   })
 
 })

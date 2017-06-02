@@ -1,15 +1,19 @@
 import {Bus} from './bus'
+import {EventEmitter} from 'events'
+import {Events} from './events'
 
-export default class ResponderBuilder {
+export default class ResponderBuilder extends EventEmitter {
 
   private bus: Bus
   private _key: string
-  private handler: (msg, content, respond) => any
-  private errorHandler: (error) => any
+  private eventEmitter: EventEmitter
+  private subscriptionId: string
 
   constructor (bus, key) {
+    super()
     this.bus = bus
     this._key = key
+    this.createEventEmitter()
   }
 
   key (): string
@@ -20,28 +24,22 @@ export default class ResponderBuilder {
     return this
   }
 
-  onRequest (handler) {
-    this.handler = handler
-    return this
+  async subscribe () {
+    this.subscriptionId = await this.bus.subscribe(this._key, this.eventEmitter, false)
   }
 
-  onError (handler) {
-    this.errorHandler = handler
-    return this
+  async unsubscribe () {
+    if (!this.subscriptionId) return
+    this.eventEmitter.removeAllListeners()
+    return this.bus.unsubscribe(this.subscriptionId)
   }
 
-  listen () {
-    return this.bus.listen(this._key, (msg, content) => this.handleRequest(msg, content), false)
-  }
-
-  private handleRequest (msg, content) {
-    this.handler(msg, content, (res) => {
-      return this.respond(res, msg)
+  private createEventEmitter () {
+    this.eventEmitter = new EventEmitter()
+    this.eventEmitter.on(Events.MESSAGE, (message, content) => {
+      this.emit(Events.REQUEST, message, content, (res) => this.bus.respond(res, message))
     })
-  }
-
-  private respond (res, msg) {
-    return this.bus.respond(res, msg)
+    this.eventEmitter.on(Events.ERROR, (error) => this.emit(Events.ERROR, error))
   }
 
 }

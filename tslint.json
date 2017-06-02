@@ -1,6 +1,7 @@
 {
   "extends": "tslint-config-standard",
   "rules": {
+    "await-promise": false,
     "padded-blocks": 0,
     "trailing-comma": [true, {"multiline": "always", "singleline": "never"}],
     "no-console": ["error"]

@@ -1,13 +1,17 @@
 import {Bus} from './bus'
+import {EventEmitter} from 'events'
 
-export default class SubscriberBuilder {
+export default class SubscriberBuilder extends EventEmitter {
 
   private bus: Bus
   private _key: string
   private _noAck: boolean
-  private handler: (msg, done, originalMsg) => void
+  private subscriptionId: string
 
   constructor (bus, key) {
+
+    super()
+
     this.bus = bus
     this._key = key
     this._noAck = false
@@ -29,12 +33,14 @@ export default class SubscriberBuilder {
     return this
   }
 
-  onMessage (handler) {
-    this.handler = handler
-    return this
+  async subscribe () {
+    this.subscriptionId = await this.bus.subscribe(this._key, this, this._noAck)
   }
 
-  listen () {
-    return this.bus.listen(this._key, this.handler, this._noAck)
+  async unsubscribe () {
+    if (!this.subscriptionId) return
+    this.removeAllListeners()
+    return this.bus.unsubscribe(this.subscriptionId)
   }
+
 }

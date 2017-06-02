@@ -1,16 +1,16 @@
-import {EventEmitter} from 'events'
 
-export interface Adapter extends EventEmitter {
+export interface Adapter {
   connect (options): Promise<void>
   disconnect (): Promise<void>
   publish (key: string, ex: string, message: object): Promise<any>
-  listen (key: string, handler: ListenHandler, noAck: boolean): Promise<any>
+  subscribe (key: string, eventEmitter: NodeJS.EventEmitter, noAck: boolean): Promise<any>
+  unsubscribe (subscriptionId: string): Promise<void>
   ack (msg): void
   nack (msg): void
   request (options): Promise<any>
   respond (res, msg): Promise<boolean>
 }
 
-interface ListenHandler {
-  (msg: any, content: object, ack): any
+export interface ResponseHandler {
+  (msg: any, content: object, respond: (response: object) => Promise<boolean>): any
 }

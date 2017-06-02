@@ -3,13 +3,13 @@ import {expect} from 'chai'
 import {Bus} from '../../src/bus'
 import PublisherBuilder from '../../src/publisherBuilder'
 import SubscriberBuilder from '../../src/subscriberBuilder'
-import {EventEmitter} from 'events'
+import {Adapter} from '../../src/types'
 
 describe('bus', function () {
 
   it('should connect and disconnect', async function () {
     const adapter = getAdapter()
-    const bus = new Bus({}, adapter)
+    const bus = new Bus({url: 'some', adapter})
     await bus.connect()
     await bus.disconnect()
     expect(adapter.connect.calledOnce).eq(true)
@@ -19,7 +19,7 @@ describe('bus', function () {
   it('publisher should create publisher', async function () {
     const topic = 'test_topic'
     const adapter = getAdapter()
-    const bus = new Bus({}, adapter)
+    const bus = new Bus({url: 'some', adapter})
     await bus.connect()
 
     const publisher = await bus.publisher(topic)
@@ -30,7 +30,7 @@ describe('bus', function () {
   it('subscriber should create subscriberBuilder', async function () {
     const topic = 'test_topic'
     const adapter = getAdapter()
-    const bus = new Bus({}, adapter)
+    const bus = new Bus({url: 'some', adapter})
     await bus.connect()
 
     const publisher = await bus.subscriber(topic)
@@ -44,18 +44,14 @@ function getAdapter () {
   return new FakeAdapter()
 }
 
-class FakeAdapter extends EventEmitter {
-
+class FakeAdapter implements Adapter {
   connect = stub().resolves()
   disconnect = stub().resolves()
   publish = stub().resolves()
-  listen = stub().resolves()
+  subscribe = stub().resolves()
+  unsubscribe = stub().resolves()
   ack = stub()
   nack = stub()
   request = stub().resolves()
   respond = stub().resolves()
-
-  constructor () {
-    super()
-  }
 }

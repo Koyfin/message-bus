@@ -3,21 +3,15 @@ import {Adapter} from './types'
 import SubscriberBuilder from './subscriberBuilder'
 import RequesterBuilder from './requesterBuilder'
 import ResponderBuilder from './responderBuilder'
-import {EventEmitter} from 'events'
 
-export class Bus extends EventEmitter {
+export class Bus {
 
   private adapter: Adapter
   private options: object
 
-  constructor (options, adapter: Adapter) {
-    super()
+  constructor (options: {url: string, adapter: Adapter}) {
     this.options = options
-    this.adapter = adapter
-
-    this.adapter.on('error', (error) => {
-      this.emit('error', error)
-    })
+    this.adapter = options.adapter
   }
 
   connect () {
@@ -36,6 +30,10 @@ export class Bus extends EventEmitter {
     return new SubscriberBuilder(this, key)
   }
 
+  unsubscribe (subscriptionId: string) {
+    return this.adapter.unsubscribe(subscriptionId)
+  }
+
   requester (key, ex = '') {
     return new RequesterBuilder(this, key, ex)
   }
@@ -48,8 +46,8 @@ export class Bus extends EventEmitter {
     return this.adapter.publish(key, exchange, message)
   }
 
-  listen (key, handler, noAck) {
-    return this.adapter.listen(key, handler, noAck)
+  subscribe (key, eventEmitter: NodeJS.EventEmitter, noAck) {
+    return this.adapter.subscribe(key, eventEmitter, noAck)
   }
 
   request (options) {

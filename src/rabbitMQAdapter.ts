@@ -2,24 +2,21 @@ import * as uuid from 'uuid'
 import * as amqplib from 'amqplib'
 import {EventEmitter} from 'events'
 import {Adapter} from './types'
+import {Events} from './events'
+import {Replies} from '@types/amqplib'
 
 interface RabbitMQOptions {
   url: string
 }
 
-export class RabbitMQAdapter extends EventEmitter implements Adapter {
+export class RabbitMQAdapter implements Adapter {
 
   private static REPLY_QUEUE = 'amq.rabbitmq.reply-to'
-  private static RESPONSE_TIMEOUT = 1000
 
   private connection: amqplib.Connection
   private channel: amqplib.Channel
   private options: RabbitMQOptions
-  private responseEmitter: EventEmitter
-
-  constructor () {
-    super()
-  }
+  private responseEmitter: NodeJS.EventEmitter
 
   private static getMessageContent (msg) {
     return JSON.parse(msg.content.toString())
@@ -27,6 +24,7 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
 
   async connect (options) {
     this.options = options
+    //noinspection TsLint
     this.connection = await amqplib.connect(this.options.url)
     this.channel = await this.connection.createChannel()
     await this.setupReplyQueue()
@@ -34,14 +32,6 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
 
   async disconnect () {
     await this.connection.close()
-  }
-
-  setupReplyQueue () {
-    this.responseEmitter = new EventEmitter()
-    this.responseEmitter.setMaxListeners(0)
-    return this.channel.consume(RabbitMQAdapter.REPLY_QUEUE,
-      (msg) => this.responseEmitter.emit(msg.properties.correlationId, msg),
-      {noAck: true})
   }
 
   async publish (key, exchange, message) {
@@ -52,17 +42,22 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
     return this.channel.publish(exchange, key, content)
   }
 
-  async listen (queue, handler, noAck) {
+  async subscribe (queue, eventEmitter: NodeJS.EventEmitter, noAck) {
     const options = {noAck}
-    return this.channel.consume(queue, (msg) => {
+    const {consumerTag} = await this.channel.consume(queue, (message) => {
       try {
-        const content = RabbitMQAdapter.getMessageContent(msg)
-        handler(msg, content)
+        const content = RabbitMQAdapter.getMessageContent(message)
+        eventEmitter.emit(Events.MESSAGE, message, content)
       } catch (error) {
-        this.nack(msg)
-        this.emit('error', error)
+        this.nack(message)
+        eventEmitter.emit(Events.ERROR, error)
       }
     }, options)
+    return consumerTag
+  }
+
+  async unsubscribe (consumerTag: string) {
+    await this.channel.cancel(consumerTag)
   }
 
   ack (msg) {
@@ -75,7 +70,7 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
 
   request (options) {
     const {key, exchange, message} = options
-    const timeout = options.timeout || RabbitMQAdapter.RESPONSE_TIMEOUT
+    const timeout = options.timeout
     if (!key && !exchange) {
       return Promise.reject(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
     }
@@ -103,4 +98,13 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
     const {replyTo, correlationId} = msg.properties
     return this.channel.publish('', replyTo, Buffer.from(JSON.stringify(res)), {correlationId})
   }
+
+  private async setupReplyQueue () {
+    this.responseEmitter = new EventEmitter()
+    this.responseEmitter.setMaxListeners(0)
+    return this.channel.consume(RabbitMQAdapter.REPLY_QUEUE,
+      (msg) => this.responseEmitter.emit(msg.properties.correlationId, msg),
+      {noAck: true})
+  }
+
 }

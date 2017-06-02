@@ -1,6 +1,9 @@
 {
   "name": "message-bus",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=6.10"
+  },
   "description": "Abstration for message bus",
   "homepage": "https://github.com/Koyfin/message-bus#readme",
   "bugs": {
@@ -11,19 +14,22 @@
     "name": "EzeTech",
     "url": "http://eze.tech/"
   },
-  "main": "src/app.js",
+  "directories": {
+    "lib": "./lib"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Koyfin/message-bus.git"
   },
   "scripts": {
     "start": "npm run build && npm run watch",
-    "build": "npm run build-ts && npm run tslint",
-    "test": "npm run test:unit && npm run test:integration",
-    "test:docker": "docker-compose -f docker-compose.test.yml up --build",
+    "build": "tsc",
+    "test": "npm run tslint && npm run test:unit && npm run test:integration",
     "test:unit": "mocha --compilers ts:ts-node/register --recursive test/unit",
     "test:integration": "mocha --compilers ts:ts-node/register --recursive test/integration",
-    "build-ts": "tsc",
+    "test:docker": "docker-compose -f docker-compose.test.yml up --build",
     "watch": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
@@ -53,5 +59,8 @@
   "optionalDependencies": {
     "fsevents": "*"
   },
-  "pre-commit": []
+  "pre-commit": [
+    "build",
+    "test"
+  ]
 }
