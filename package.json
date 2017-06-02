@@ -27,9 +27,9 @@
     "start": "npm run build && npm run watch",
     "build": "tsc",
     "test": "npm run tslint && npm run test:unit && npm run test:integration",
-    "test:docker": "docker-compose -f docker-compose.test.yml up --build",
     "test:unit": "mocha --compilers ts:ts-node/register --recursive test/unit",
     "test:integration": "mocha --compilers ts:ts-node/register --recursive test/integration",
+    "test:docker": "docker-compose -f docker-compose.test.yml up --build",
     "watch": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
@@ -60,6 +60,7 @@
     "fsevents": "*"
   },
   "pre-commit": [
+    "build",
     "test"
   ]
 }
