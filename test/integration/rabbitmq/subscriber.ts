@@ -1,4 +1,4 @@
-import {Bus, RabbitMQAdapter} from '../../../src'
+import {Bus, RabbitMQAdapter, Events} from '../../../src'
 import * as Bluebird from 'bluebird'
 import {expect} from 'chai'
 import * as amqp from 'amqplib'
@@ -53,30 +53,23 @@ describe('subscriber', function () {
   it('subscriber should receive published msg', function (done) {
     subscriber = bus.subscriber('test')
     const testContent = {test: 'val'}
-    subscriber.onMessage((msg, content) => {
-      expect(content).to.eql(testContent)
-      bus.ack(msg)
-      done()
-    }).subscribe().then(() => {
-      return ch.publish('', 'test', Buffer.from(JSON.stringify(testContent)))
-    })
-
-  })
-
-  it('subscriber should produce error if onMessage handler not set', function (done) {
-    subscriber = bus.subscriber('test')
     subscriber
+      .on(Events.MESSAGE, (message, content) => {
+        expect(content).to.eql(testContent)
+        bus.ack(message)
+        done()
+      })
       .subscribe()
-      .then(() => ch.publish('', 'test', Buffer.from(JSON.stringify({}))))
-      .catch(() => done())
+      .then(() => {
+        return ch.publish('', 'test', Buffer.from(JSON.stringify(testContent)))
+      })
+
   })
 
   it('subscriber should call onError handler if invalid message received', function (done) {
     subscriber = bus.subscriber('test')
-    //noinspection TsLint
     subscriber
-      .onMessage(() => {})
-      .onError(() => done())
+      .on(Events.ERROR, () => done())
       .subscribe()
       .then(() => ch.publish('', 'test', Buffer.from('invalid json')))
       .catch(done)

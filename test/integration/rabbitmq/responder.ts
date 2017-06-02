@@ -1,4 +1,4 @@
-import {Bus, RabbitMQAdapter} from '../../../src'
+import {Bus, RabbitMQAdapter, Events} from '../../../src'
 import * as Bluebird from 'bluebird'
 import {expect} from 'chai'
 import * as amqp from 'amqplib'
@@ -76,7 +76,7 @@ describe('responder', function () {
     }
 
     responder
-      .onRequest((msg, content, respond) => {
+      .on(Events.REQUEST, (msg, content, respond) => {
         return respond(content)
       })
       .subscribe()
@@ -89,21 +89,10 @@ describe('responder', function () {
 
   })
 
-  it('subscriber should produce error if onRequest handler not set', function (done) {
+  it('responder should call onError handler if invalid message received', function (done) {
     responder = bus.responder('test')
     responder
-      .onError(() => done())
-      .subscribe()
-      .then(() => ch.publish('', 'test', Buffer.from(JSON.stringify({}))))
-      .catch(() => done())
-  })
-
-  it('subscriber should call onError handler if invalid message received', function (done) {
-    responder = bus.responder('test')
-    //noinspection TsLint
-    responder
-      .onRequest(() => {})
-      .onError(() => done())
+      .on(Events.ERROR, () => done())
       .subscribe()
       .then(() => ch.publish('', 'test', Buffer.from('invalid json')))
       .catch(done)

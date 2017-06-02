@@ -2,24 +2,21 @@ import * as uuid from 'uuid'
 import * as amqplib from 'amqplib'
 import {EventEmitter} from 'events'
 import {Adapter} from './types'
+import {Events} from './events'
 import {Replies} from '@types/amqplib'
 
 interface RabbitMQOptions {
   url: string
 }
 
-export class RabbitMQAdapter extends EventEmitter implements Adapter {
+export class RabbitMQAdapter implements Adapter {
 
   private static REPLY_QUEUE = 'amq.rabbitmq.reply-to'
 
   private connection: amqplib.Connection
   private channel: amqplib.Channel
   private options: RabbitMQOptions
-  private responseEmitter: EventEmitter
-
-  constructor () {
-    super()
-  }
+  private responseEmitter: NodeJS.EventEmitter
 
   private static getMessageContent (msg) {
     return JSON.parse(msg.content.toString())
@@ -45,15 +42,15 @@ export class RabbitMQAdapter extends EventEmitter implements Adapter {
     return this.channel.publish(exchange, key, content)
   }
 
-  async subscribe (queue, eventEmitter, noAck) {
+  async subscribe (queue, eventEmitter: NodeJS.EventEmitter, noAck) {
     const options = {noAck}
-    const {consumerTag} = await this.channel.consume(queue, (msg) => {
+    const {consumerTag} = await this.channel.consume(queue, (message) => {
       try {
-        const content = RabbitMQAdapter.getMessageContent(msg)
-        eventEmitter.emit('msg', {msg, content})
+        const content = RabbitMQAdapter.getMessageContent(message)
+        eventEmitter.emit(Events.MESSAGE, message, content)
       } catch (error) {
-        this.nack(msg)
-        eventEmitter.emit('error', error)
+        this.nack(message)
+        eventEmitter.emit(Events.ERROR, error)
       }
     }, options)
     return consumerTag

@@ -1,13 +1,10 @@
-/// <reference types="node" />
-import { EventEmitter } from 'events';
 import { Adapter } from './types';
-export declare class RabbitMQAdapter extends EventEmitter implements Adapter {
+export declare class RabbitMQAdapter implements Adapter {
     private static REPLY_QUEUE;
     private connection;
     private channel;
     private options;
     private responseEmitter;
-    constructor();
     private static getMessageContent(msg);
     connect(options: any): Promise<void>;
     disconnect(): Promise<void>;

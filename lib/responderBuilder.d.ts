@@ -1,5 +1,6 @@
-import { ResponseHandler } from './types';
-export default class ResponderBuilder {
+/// <reference types="node" />
+import { EventEmitter } from 'events';
+export default class ResponderBuilder extends EventEmitter {
     private bus;
     private _key;
     private handler;
@@ -9,8 +10,6 @@ export default class ResponderBuilder {
     constructor(bus: any, key: any);
     key(): string;
     key(key: string): this;
-    onRequest(handler: ResponseHandler): this;
-    onError(handler: any): this;
     subscribe(): Promise<void>;
     unsubscribe(): Promise<void>;
     private createEventEmitter();
