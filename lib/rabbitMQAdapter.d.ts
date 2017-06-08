@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import * as amqplib from 'amqplib';
 import { Adapter } from './types';
 export declare class RabbitMQAdapter implements Adapter {
     private static REPLY_QUEUE;
@@ -9,6 +10,7 @@ export declare class RabbitMQAdapter implements Adapter {
     private static getMessageContent(msg);
     connect(options: any): Promise<void>;
     disconnect(): Promise<void>;
+    configure(cb: (channel: amqplib.Channel) => Promise<any>): Promise<void>;
     publish(key: any, exchange: any, message: any): Promise<boolean>;
     subscribe(queue: any, eventEmitter: NodeJS.EventEmitter, noAck: any): Promise<string>;
     unsubscribe(consumerTag: string): Promise<void>;
