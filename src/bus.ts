@@ -9,7 +9,7 @@ export class Bus {
   private adapter: Adapter
   private options: object
 
-  constructor (options: {url: string, adapter: Adapter}) {
+  constructor (options: { url: string, adapter: Adapter }) {
     this.options = options
     this.adapter = options.adapter
   }
@@ -20,6 +20,10 @@ export class Bus {
 
   disconnect () {
     return this.adapter.disconnect()
+  }
+
+  configure (cb: (channel) => Promise<any>) {
+    return this.adapter.configure(cb)
   }
 
   publisher (key = '', ex = '') {

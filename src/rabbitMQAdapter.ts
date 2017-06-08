@@ -34,6 +34,10 @@ export class RabbitMQAdapter implements Adapter {
     await this.connection.close()
   }
 
+  async configure (cb: (channel: amqplib.Channel) => Promise<any>) {
+    await cb(this.channel)
+  }
+
   async publish (key, exchange, message) {
     if (!key && !exchange) {
       throw new Error(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
