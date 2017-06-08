@@ -47,6 +47,7 @@ function getAdapter () {
 class FakeAdapter implements Adapter {
   connect = stub().resolves()
   disconnect = stub().resolves()
+  configure = stub().resolves()
   publish = stub().resolves()
   subscribe = stub().resolves()
   unsubscribe = stub().resolves()
