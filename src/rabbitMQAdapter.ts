@@ -53,7 +53,9 @@ export class RabbitMQAdapter implements Adapter {
         const content = RabbitMQAdapter.getMessageContent(message)
         eventEmitter.emit(Events.MESSAGE, message, content)
       } catch (error) {
-        this.nack(message)
+        if (!noAck) {
+          this.nack(message)
+        }
         eventEmitter.emit(Events.ERROR, error)
       }
     }, options)
