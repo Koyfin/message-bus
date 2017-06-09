@@ -25,7 +25,7 @@ export default class ResponderBuilder extends EventEmitter {
   }
 
   async subscribe () {
-    this.subscriptionId = await this.bus.subscribe(this._key, this.eventEmitter, false)
+    this.subscriptionId = await this.bus.subscribe(this._key, this.eventEmitter, true)
   }
 
   async unsubscribe () {

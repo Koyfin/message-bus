@@ -13,6 +13,7 @@ export declare class Bus {
     });
     connect(): Promise<void>;
     disconnect(): Promise<void>;
+    configure(cb: (channel) => Promise<any>): Promise<any>;
     publisher(key?: string, ex?: string): PublisherBuilder;
     subscriber(key: any): SubscriberBuilder;
     unsubscribe(subscriptionId: string): Promise<void>;

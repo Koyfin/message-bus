@@ -2,6 +2,7 @@
 export interface Adapter {
   connect (options): Promise<void>
   disconnect (): Promise<void>
+  configure (cb: (channel) => Promise<any>): Promise<any>
   publish (key: string, ex: string, message: object): Promise<any>
   subscribe (key: string, eventEmitter: NodeJS.EventEmitter, noAck: boolean): Promise<any>
   unsubscribe (subscriptionId: string): Promise<void>
