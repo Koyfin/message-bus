@@ -1,15 +1,15 @@
-import {Bus} from './bus'
+import {BusWorker} from './types'
 
 export default class RequesterBuilder {
 
   private static DEFAULT_TIMEOUT = 1000
-  private bus: Bus
+  private worker: BusWorker
   private _key: string
   private _exchange: string
   private _timeout: number
 
-  constructor (bus, key, ex = '') {
-    this.bus = bus
+  constructor (worker: BusWorker, key, ex = '') {
+    this.worker = worker
     this._key = key
     this._exchange = ex
     this._timeout = RequesterBuilder.DEFAULT_TIMEOUT
@@ -46,7 +46,7 @@ export default class RequesterBuilder {
       message: message,
       timeout: this._timeout,
     }
-    return this.bus.request(options)
+    return this.worker.request(options)
   }
 
 }

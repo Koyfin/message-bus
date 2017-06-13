@@ -1,13 +1,13 @@
-import {Bus} from './bus'
+import {BusWorker} from './types'
 
 export default class PublisherBuilder {
 
-  private bus: Bus
+  private worker: BusWorker
   private _key: string
   private _exchange: string
 
-  constructor (bus, key, ex) {
-    this.bus = bus
+  constructor (worker: BusWorker, key, ex) {
+    this.worker = worker
     this._key = key
     this._exchange = ex
   }
@@ -34,7 +34,7 @@ export default class PublisherBuilder {
   }
 
   publish (message) {
-    return this.bus.publish(this._key, this._exchange, message)
+    return this.worker.publish(this._key, this._exchange, message)
   }
 
 }

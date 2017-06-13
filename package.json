@@ -22,10 +22,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "npm run tslint && npm run test:unit && npm run test:integration",
+    "test": "npm run tslint && mocha --compilers ts:ts-node/register",
     "test:docker": "docker-compose -f docker-compose.test.yml up --build",
-    "test:integration": "mocha --compilers ts:ts-node/register --recursive test/integration",
-    "test:unit": "mocha --compilers ts:ts-node/register --recursive test/unit",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "watch": "tsc -w"
   },

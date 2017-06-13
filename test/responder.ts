@@ -1,16 +1,15 @@
-import {Bus, RabbitMQAdapter, Events} from '../../../src'
+import {Bus, Events} from '../src'
 import * as Bluebird from 'bluebird'
 import {expect} from 'chai'
 import * as amqp from 'amqplib'
-import ResponderBuilder from '../../../src/responderBuilder'
+import ResponderBuilder from '../src/responderBuilder'
 
 describe('responder', function () {
 
   const url = process.env.BUS_URL || 'amqp://localhost:5672'
-  const adapter = new RabbitMQAdapter()
-  const bus = new Bus({url, adapter})
   const responderQueue = 'responderQueue'
   const requesterQueue = 'requesterQueue'
+  let bus: Bus
 
   let defaultHandler = (msg): any => {
     throw new Error('replace default handler!')
@@ -22,7 +21,10 @@ describe('responder', function () {
 
   before('wait bus ready', function () {
     function connect () {
-      return bus.connect()
+      return Bus.connect(url)
+        .then(_bus => {
+          bus = _bus
+        })
         .catch(() => {
           return Bluebird.delay(1000).then(connect)
         })

@@ -1,4 +1,4 @@
-import {Bus, RabbitMQAdapter} from '../../../src'
+import {Bus} from '../src'
 import * as Bluebird from 'bluebird'
 import {expect} from 'chai'
 import * as amqp from 'amqplib'
@@ -6,14 +6,15 @@ import * as amqp from 'amqplib'
 describe('requester', function () {
 
   const url = process.env.BUS_URL || 'amqp://localhost:5672'
-  const adapter = new RabbitMQAdapter()
-  const bus = new Bus({url, adapter})
-
+  let bus: Bus
   let conn: amqp.Connection
 
   before('wait bus ready', function () {
     function connect () {
-      return bus.connect()
+      return Bus.connect(url)
+        .then(_bus => {
+          bus = _bus
+        })
         .catch(() => {
           return Bluebird.delay(1000).then(connect)
         })

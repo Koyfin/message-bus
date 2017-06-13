@@ -1,10 +1,11 @@
+import { BusWorker } from './types';
 export default class RequesterBuilder {
     private static DEFAULT_TIMEOUT;
-    private bus;
+    private worker;
     private _key;
     private _exchange;
     private _timeout;
-    constructor(bus: any, key: any, ex?: string);
+    constructor(worker: BusWorker, key: any, ex?: string);
     exchange(): string;
     exchange(exchange: string): this;
     key(): string;

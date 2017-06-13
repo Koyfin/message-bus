@@ -1,18 +1,18 @@
-import {Bus} from './bus'
 import {EventEmitter} from 'events'
+import {BusWorker} from './types'
 
 export default class SubscriberBuilder extends EventEmitter {
 
-  private bus: Bus
+  private worker: BusWorker
   private _key: string
   private _noAck: boolean
   private subscriptionId: string
 
-  constructor (bus, key) {
+  constructor (worker: BusWorker, key) {
 
     super()
 
-    this.bus = bus
+    this.worker = worker
     this._key = key
     this._noAck = false
   }
@@ -34,13 +34,13 @@ export default class SubscriberBuilder extends EventEmitter {
   }
 
   async subscribe () {
-    this.subscriptionId = await this.bus.subscribe(this._key, this, this._noAck)
+    this.subscriptionId = await this.worker.subscribe(this._key, this, this._noAck)
   }
 
   async unsubscribe () {
     if (!this.subscriptionId) return
     this.removeAllListeners()
-    return this.bus.unsubscribe(this.subscriptionId)
+    return this.worker.unsubscribe(this.subscriptionId)
   }
 
 }

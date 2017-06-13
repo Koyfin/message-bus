@@ -1,8 +1,10 @@
+import * as amqp from 'amqplib'
 
-export interface Adapter {
+export interface BusWorker {
   connect (options): Promise<void>
   disconnect (): Promise<void>
   configure (cb: (channel) => Promise<any>): Promise<any>
+  channel (): amqp.Channel
   publish (key: string, ex: string, message: object): Promise<any>
   subscribe (key: string, eventEmitter: NodeJS.EventEmitter, noAck: boolean): Promise<any>
   unsubscribe (subscriptionId: string): Promise<void>
@@ -10,8 +12,4 @@ export interface Adapter {
   nack (msg): void
   request (options): Promise<any>
   respond (res, msg): Promise<boolean>
-}
-
-export interface ResponseHandler {
-  (msg: any, content: object, respond: (response: object) => Promise<boolean>): any
 }
