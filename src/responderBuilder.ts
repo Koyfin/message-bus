@@ -43,7 +43,9 @@ export default class ResponderBuilder extends EventEmitter {
       }
       this.emit(route, message, content, (res) => this.worker.respond(res, message))
     })
-    this.eventEmitter.on(Events.ERROR, (error, message) => this.emit(Events.ERROR, error, message))
+    this.eventEmitter.on(Events.ERROR, (error, message) => {
+      this.emit(Events.ERROR, error, message, (res) => this.worker.respond(res, message))
+    })
   }
 
 }
