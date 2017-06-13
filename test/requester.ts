@@ -8,6 +8,10 @@ describe('requester', function () {
   const url = process.env.BUS_URL || 'amqp://localhost:5672'
   let bus: Bus
   let conn: amqp.Connection
+  let ch: amqp.Channel
+  let handler: any = (msg) => {
+    throw new Error('not implemented!')
+  }
 
   before('wait bus ready', function () {
     function connect () {
@@ -29,13 +33,12 @@ describe('requester', function () {
         conn = _conn
         return conn.createChannel()
       })
-      .then(ch => {
+      .then(_ch => {
+        ch = _ch
         return ch.assertQueue('test')
           .then(() => ch.purgeQueue('test'))
           // echo responder
-          .then(() => ch.consume('test', (msg) => {
-            return ch.publish('', msg.properties.replyTo, msg.content, {correlationId: msg.properties.correlationId})
-          }, {noAck: true}))
+          .then(() => ch.consume('test', (msg) => handler(msg), {noAck: true}))
       })
   })
 
@@ -50,10 +53,16 @@ describe('requester', function () {
   it('responder should respond with request msg', function () {
     const requester = bus.requester('test')
     const testContent = {test: 'val'}
+    const route = 'some route'
+
+    handler = (msg) => {
+      expect(msg.properties.type).to.eq(route)
+      return ch.publish('', msg.properties.replyTo, msg.content, {correlationId: msg.properties.correlationId})
+    }
 
     return requester
-      .request(testContent)
-      .then(({msg, content}) => {
+      .request(testContent, route)
+      .then(({content}) => {
         expect(content).to.eql(testContent)
       })
 

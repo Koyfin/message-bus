@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
-import { BusWorker } from "./types";
+import { BusWorker } from './types';
 export default class ResponderBuilder extends EventEmitter {
     private worker;
     private _key;

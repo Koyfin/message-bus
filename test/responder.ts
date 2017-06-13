@@ -69,6 +69,7 @@ describe('responder', function () {
     const replyTo = requesterQueue
     const correlationId = 'correlationId'
     const testContent = {test: 'val'}
+    const route = 'some-route'
     responder = bus.responder(responderQueue)
 
     handler = (msg) => {
@@ -78,7 +79,7 @@ describe('responder', function () {
     }
 
     responder
-      .on(Events.REQUEST, (msg, content, respond) => {
+      .on(route, (msg, content, respond) => {
         return respond(content)
       })
       .subscribe()
@@ -86,17 +87,80 @@ describe('responder', function () {
         return ch.publish('', responderQueue, Buffer.from(JSON.stringify(testContent)), {
           replyTo,
           correlationId,
+          type: route,
         })
       })
 
   })
 
-  it('responder should call onError handler if invalid message received', function (done) {
+  it('responder should respond with "" route', function (done) {
+    const replyTo = requesterQueue
+    const correlationId = 'correlationId'
+    const testContent = {test: 'val'}
+    const route = ''
+    responder = bus.responder(responderQueue)
+
+    handler = (msg) => {
+      const content = JSON.parse(msg.content.toString())
+      expect(content).eql(testContent)
+      done()
+    }
+
+    responder
+      .on(route, (msg, content, respond) => {
+        return respond(content)
+      })
+      .subscribe()
+      .then(() => {
+        return ch.publish('', responderQueue, Buffer.from(JSON.stringify(testContent)), {
+          replyTo,
+          correlationId,
+          type: route,
+        })
+      })
+
+  })
+
+  it('responder should respond with Events.ROUTE_NOT_FOUND if route not found', function (done) {
+    const replyTo = requesterQueue
+    const correlationId = 'correlationId'
+    const requestContent = {some: 'val'}
+    const responseContent = {error: 'not found'}
+    const route = 'some route'
+    responder = bus.responder(responderQueue)
+
+    handler = (msg) => {
+      const content = JSON.parse(msg.content.toString())
+      expect(content).eql(responseContent)
+      done()
+    }
+
+    responder
+      .on(Events.ROUTE_NOT_FOUND, (msg, content, respond) => {
+        return respond(responseContent)
+      })
+      .subscribe()
+      .then(() => {
+        return ch.publish('', responderQueue, Buffer.from(JSON.stringify(requestContent)), {
+          replyTo,
+          correlationId,
+          type: route,
+        })
+      })
+
+  })
+
+  it('responder should emit error event with message if invalid message received', function (done) {
+    const content = 'invalid json'
     responder = bus.responder('test')
     responder
-      .on(Events.ERROR, () => done())
+      .on(Events.ERROR, (error, message) => {
+        expect(error instanceof Error).to.eq(true)
+        expect(message.content.toString()).to.eq(content)
+        done()
+      })
       .subscribe()
-      .then(() => ch.publish('', 'test', Buffer.from('invalid json')))
+      .then(() => ch.publish('', 'test', Buffer.from(content)))
       .catch(done)
   })
 

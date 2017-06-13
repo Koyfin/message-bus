@@ -56,7 +56,7 @@ export class RabbitMQWorker implements BusWorker {
         if (!noAck) {
           this.nack(message)
         }
-        eventEmitter.emit(Events.ERROR, error)
+        eventEmitter.emit(Events.ERROR, error, message)
       }
     }, options)
     return consumerTag
@@ -75,8 +75,7 @@ export class RabbitMQWorker implements BusWorker {
   }
 
   request (options) {
-    const {key, exchange, message} = options
-    const timeout = options.timeout
+    const {key, exchange, timeout, route, message} = options
     if (!key && !exchange) {
       return Promise.reject(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
     }
@@ -96,6 +95,7 @@ export class RabbitMQWorker implements BusWorker {
       this._channel.publish(exchange, key, Buffer.from(JSON.stringify(message)), {
         correlationId,
         replyTo: RabbitMQWorker.REPLY_QUEUE,
+        type: route,
       })
     })
   }

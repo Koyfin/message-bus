@@ -10,6 +10,14 @@ export interface BusWorker {
   unsubscribe (subscriptionId: string): Promise<void>
   ack (msg): void
   nack (msg): void
-  request (options): Promise<any>
+  request (options: RequestOptions): Promise<any>
   respond (res, msg): Promise<boolean>
+}
+
+interface RequestOptions {
+  key: string,
+  exchange: string,
+  timeout: number,
+  route: string,
+  message: object,
 }

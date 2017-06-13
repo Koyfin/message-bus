@@ -36,11 +36,22 @@ const url = 'amqp://localhost'
    
 Bus.connect(url)
 .then((bus) => {
-  const requester = bus.requester('somekey')
-  const responder = bus.responder('somekey')
+  const route = 'optional route'
+  const requester = bus.requester('somekey', route)
+  const responder = bus.responder('somekey', route)
 
   responder
-    .on(Events.REQUEST, (msg, content, respond) => {
+    .on(route, (msg, content, respond) => {
+      console.log('responding on ', content) // parsed message content
+      return respond(msg)
+    })
+    // if route not specified
+    .on(Events.ROUTE_DEFAULT, (msg, content, respond) => {
+      console.log('responding on ', content) // parsed message content
+      return respond(msg)
+    })
+    // fallback, if no handlers found for given route
+    .on(Events.ROUTE_NOT_FOUND, (msg, content, respond) => {
       console.log('responding on ', content) // parsed message content
       return respond(msg)
     })

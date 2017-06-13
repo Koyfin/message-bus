@@ -1,4 +1,5 @@
 import {BusWorker} from './types'
+import {Events} from './events'
 
 export default class RequesterBuilder {
 
@@ -39,12 +40,13 @@ export default class RequesterBuilder {
     return this
   }
 
-  async request (message) {
+  async request (message: object, route = Events.ROUTE_DEFAULT ) {
     const options = {
       key: this._key,
       exchange: this._exchange,
-      message: message,
       timeout: this._timeout,
+      route,
+      message,
     }
     return this.worker.request(options)
   }

@@ -12,5 +12,5 @@ export default class RequesterBuilder {
     key(key: string): this;
     timeout(): number;
     timeout(timeout: number): this;
-    request(message: any): Promise<any>;
+    request(message: object, route?: string): Promise<any>;
 }
