@@ -1,28 +1,20 @@
-/// <reference types="node" />
 import PublisherBuilder from './publisherBuilder';
-import { Adapter } from './types';
 import SubscriberBuilder from './subscriberBuilder';
 import RequesterBuilder from './requesterBuilder';
 import ResponderBuilder from './responderBuilder';
+import { Channel } from '@types/amqplib';
 export declare class Bus {
-    private adapter;
+    private worker;
     private options;
-    constructor(options: {
-        url: string;
-        adapter: Adapter;
-    });
-    connect(): Promise<void>;
+    private constructor(options);
+    static connect(url: string): Promise<Bus>;
     disconnect(): Promise<void>;
     configure(cb: (channel) => Promise<any>): Promise<any>;
+    channel(): Channel;
     publisher(key?: string, ex?: string): PublisherBuilder;
     subscriber(key: any): SubscriberBuilder;
-    unsubscribe(subscriptionId: string): Promise<void>;
     requester(key: any, ex?: string): RequesterBuilder;
     responder(key: any): ResponderBuilder;
-    publish(key: any, exchange: any, message: any): Promise<any>;
-    subscribe(key: any, eventEmitter: NodeJS.EventEmitter, noAck: any): Promise<any>;
-    request(options: any): Promise<any>;
-    respond(res: any, msg: any): Promise<boolean>;
     ack(msg: any): void;
     nack(msg: any): void;
 }

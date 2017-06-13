@@ -1,72 +1,60 @@
 import PublisherBuilder from './publisherBuilder'
-import {Adapter} from './types'
+import {RabbitMQWorker} from './rabbitMQWorker'
 import SubscriberBuilder from './subscriberBuilder'
 import RequesterBuilder from './requesterBuilder'
 import ResponderBuilder from './responderBuilder'
+import {BusWorker} from './types'
+import {Channel} from '@types/amqplib'
 
 export class Bus {
 
-  private adapter: Adapter
+  private worker: BusWorker
   private options: object
 
-  constructor (options: { url: string, adapter: Adapter }) {
+  private constructor (options: { worker: BusWorker }) {
     this.options = options
-    this.adapter = options.adapter
+    this.worker = options.worker
   }
 
-  connect () {
-    return this.adapter.connect(this.options)
+  static async connect (url: string) {
+    const bus = new Bus({worker: new RabbitMQWorker()})
+    await bus.worker.connect(url)
+    return bus
   }
 
   disconnect () {
-    return this.adapter.disconnect()
+    return this.worker.disconnect()
   }
 
   configure (cb: (channel) => Promise<any>) {
-    return this.adapter.configure(cb)
+    return this.worker.configure(cb)
+  }
+
+  channel () {
+    return this.worker.channel()
   }
 
   publisher (key = '', ex = '') {
-    return new PublisherBuilder(this, key, ex)
+    return new PublisherBuilder(this.worker, key, ex)
   }
 
   subscriber (key) {
-    return new SubscriberBuilder(this, key)
-  }
-
-  unsubscribe (subscriptionId: string) {
-    return this.adapter.unsubscribe(subscriptionId)
+    return new SubscriberBuilder(this.worker, key)
   }
 
   requester (key, ex = '') {
-    return new RequesterBuilder(this, key, ex)
+    return new RequesterBuilder(this.worker, key, ex)
   }
 
   responder (key) {
-    return new ResponderBuilder(this, key)
-  }
-
-  publish (key, exchange, message) {
-    return this.adapter.publish(key, exchange, message)
-  }
-
-  subscribe (key, eventEmitter: NodeJS.EventEmitter, noAck) {
-    return this.adapter.subscribe(key, eventEmitter, noAck)
-  }
-
-  request (options) {
-    return this.adapter.request(options)
-  }
-
-  respond (res, msg) {
-    return this.adapter.respond(res, msg)
+    return new ResponderBuilder(this.worker, key)
   }
 
   ack (msg) {
-    return this.adapter.ack(msg)
+    return this.worker.ack(msg)
   }
 
   nack (msg) {
-    return this.adapter.nack(msg)
+    return this.worker.nack(msg)
   }
 }

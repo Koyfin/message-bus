@@ -1,11 +1,12 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
+import { BusWorker } from './types';
 export default class SubscriberBuilder extends EventEmitter {
-    private bus;
+    private worker;
     private _key;
     private _noAck;
     private subscriptionId;
-    constructor(bus: any, key: any);
+    constructor(worker: BusWorker, key: any);
     key(): string;
     key(key: string): this;
     noAck(): boolean;
