@@ -1,16 +1,17 @@
 /// <reference types="node" />
 import * as amqplib from 'amqplib';
-import { Adapter } from './types';
-export declare class RabbitMQAdapter implements Adapter {
+import { BusWorker } from './types';
+export declare class RabbitMQWorker implements BusWorker {
     private static REPLY_QUEUE;
     private connection;
-    private channel;
-    private options;
+    private _channel;
+    private url;
     private responseEmitter;
     private static getMessageContent(msg);
-    connect(options: any): Promise<void>;
+    connect(url: string): Promise<void>;
     disconnect(): Promise<void>;
     configure(cb: (channel: amqplib.Channel) => Promise<any>): Promise<void>;
+    channel(): amqplib.Channel;
     publish(key: any, exchange: any, message: any): Promise<boolean>;
     subscribe(queue: any, eventEmitter: NodeJS.EventEmitter, noAck: any): Promise<string>;
     unsubscribe(consumerTag: string): Promise<void>;

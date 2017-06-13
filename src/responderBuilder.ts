@@ -1,17 +1,17 @@
-import {Bus} from './bus'
 import {EventEmitter} from 'events'
 import {Events} from './events'
+import {BusWorker} from './types'
 
 export default class ResponderBuilder extends EventEmitter {
 
-  private bus: Bus
+  private worker: BusWorker
   private _key: string
   private eventEmitter: EventEmitter
   private subscriptionId: string
 
-  constructor (bus, key) {
+  constructor (worker: BusWorker, key) {
     super()
-    this.bus = bus
+    this.worker = worker
     this._key = key
     this.createEventEmitter()
   }
@@ -25,21 +25,25 @@ export default class ResponderBuilder extends EventEmitter {
   }
 
   async subscribe () {
-    this.subscriptionId = await this.bus.subscribe(this._key, this.eventEmitter, true)
+    this.subscriptionId = await this.worker.subscribe(this._key, this.eventEmitter, true)
   }
 
   async unsubscribe () {
     if (!this.subscriptionId) return
     this.eventEmitter.removeAllListeners()
-    return this.bus.unsubscribe(this.subscriptionId)
+    return this.worker.unsubscribe(this.subscriptionId)
   }
 
   private createEventEmitter () {
     this.eventEmitter = new EventEmitter()
     this.eventEmitter.on(Events.MESSAGE, (message, content) => {
-      this.emit(Events.REQUEST, message, content, (res) => this.bus.respond(res, message))
+      let route = message.properties.type || Events.ROUTE_DEFAULT
+      if (!this.listenerCount(route)) {
+        route = Events.ROUTE_NOT_FOUND
+      }
+      this.emit(route, message, content, (res) => this.worker.respond(res, message))
     })
-    this.eventEmitter.on(Events.ERROR, (error) => this.emit(Events.ERROR, error))
+    this.eventEmitter.on(Events.ERROR, (error, message) => this.emit(Events.ERROR, error, message))
   }
 
 }

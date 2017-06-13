@@ -1,14 +1,13 @@
-import {Bus, RabbitMQAdapter, Events} from '../../../src'
+import {Bus, Events} from '../src'
 import * as Bluebird from 'bluebird'
 import {expect} from 'chai'
 import * as amqp from 'amqplib'
-import SubscriberBuilder from '../../../src/subscriberBuilder'
+import SubscriberBuilder from '../src/subscriberBuilder'
 
 describe('subscriber', function () {
 
   const url = process.env.BUS_URL || 'amqp://localhost:5672'
-  const adapter = new RabbitMQAdapter()
-  const bus = new Bus({url, adapter})
+  let bus: Bus
 
   let subscriber: SubscriberBuilder
   let ch: amqp.Channel
@@ -16,7 +15,10 @@ describe('subscriber', function () {
 
   before('wait bus ready', function () {
     function connect () {
-      return bus.connect()
+      return Bus.connect(url)
+        .then(_bus => {
+          bus = _bus
+        })
         .catch(() => {
           return Bluebird.delay(1000).then(connect)
         })

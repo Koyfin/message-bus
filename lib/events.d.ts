@@ -1,5 +1,6 @@
 export declare const Events: {
     MESSAGE: string;
     ERROR: string;
-    REQUEST: string;
+    ROUTE_DEFAULT: string;
+    ROUTE_NOT_FOUND: string;
 };
