@@ -16,5 +16,5 @@ export declare class Bus {
     requester(key: any, ex?: string): RequesterBuilder;
     responder(key: any): ResponderBuilder;
     ack(msg: any): void;
-    nack(msg: any): void;
+    nack(msg: any, allUpTo?: boolean, requeue?: boolean): void;
 }

@@ -16,7 +16,7 @@ export declare class RabbitMQWorker implements BusWorker {
     subscribe(queue: any, eventEmitter: NodeJS.EventEmitter, noAck: any): Promise<string>;
     unsubscribe(consumerTag: string): Promise<void>;
     ack(msg: any): void;
-    nack(msg: any): void;
+    nack(msg: any, allUpTo: any, requeue: any): void;
     request(options: any): Promise<never>;
     respond(res: any, msg: any): Promise<boolean>;
     private setupReplyQueue();
