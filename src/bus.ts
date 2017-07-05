@@ -54,7 +54,7 @@ export class Bus {
     return this.worker.ack(msg)
   }
 
-  nack (msg) {
-    return this.worker.nack(msg)
+  nack (msg, allUpTo = false, requeue = true) {
+    return this.worker.nack(msg, allUpTo, requeue)
   }
 }

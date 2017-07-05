@@ -7,6 +7,7 @@ import SubscriberBuilder from '../src/subscriberBuilder'
 describe('subscriber', function () {
 
   const url = process.env.BUS_URL || 'amqp://localhost:5672'
+  const queue = 'test'
   let bus: Bus
 
   let subscriber: SubscriberBuilder
@@ -35,9 +36,9 @@ describe('subscriber', function () {
       })
       .then(_ch => {
         ch = _ch
-        return _ch.assertQueue('test')
-          .then(() => _ch.purgeQueue('test'))
       })
+      .then(() => ch.assertQueue(queue))
+      .then(() => ch.purgeQueue(queue))
   })
 
   after('disconnect bus', function () {
@@ -46,6 +47,10 @@ describe('subscriber', function () {
 
   after('close amqp connection', function () {
     return conn.close()
+  })
+
+  beforeEach('purge queue', function () {
+    return ch.purgeQueue(queue)
   })
 
   afterEach('destroy subscriber', function () {
@@ -68,10 +73,14 @@ describe('subscriber', function () {
 
   })
 
-  it('subscriber should call onError handler if invalid message received', function (done) {
+  it('subscriber should call onError handler with error and msg arguments if invalid message received', function (done) {
     subscriber = bus.subscriber('test')
     subscriber
-      .on(Events.ERROR, () => done())
+      .on(Events.ERROR, (error, message) => {
+        expect(error instanceof Error).to.eq(true)
+        expect(message instanceof Object).to.eq(true)
+        done()
+      })
       .subscribe()
       .then(() => ch.publish('', 'test', Buffer.from('invalid json')))
       .catch(done)
