@@ -1,7 +1,7 @@
 {
-  "name": "message-bus",
-  "version": "0.0.1",
-  "description": "Abstration for message bus",
+  "name": "@koyfin/message-bus",
+  "version": "0.1.0",
+  "description": "Usefull abstrations for rabbitmq",
   "homepage": "https://github.com/Koyfin/message-bus#readme",
   "bugs": {
     "url": "https://github.com/Koyfin/message-bus/issues"

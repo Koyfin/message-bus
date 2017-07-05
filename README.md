@@ -19,7 +19,10 @@ Bus.connect(url)
       console.log(content) // parsed message content
       bus.ack(msg)
     })
-    .on(Events.ERROR, error => console.error(error))
+    .on(Events.ERROR, (error, msg) => {
+      console.error(error)
+      bus.nack(msg, allUpTo, requeue) // bus.ack(msg)
+    })
       
     subscriber.subscribe()
     .then(() => {
