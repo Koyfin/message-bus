@@ -70,3 +70,4 @@ Dockerfile.test
 tsconfig.json
 tsconfig.base.json
 tslint.json
+.idea/
