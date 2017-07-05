@@ -25,4 +25,5 @@ typings/
 .yarn-integrity
 .env
 .idea/
-lib/*.js.map
+lib/
+ts-node-*
