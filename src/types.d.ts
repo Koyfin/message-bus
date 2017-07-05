@@ -9,7 +9,7 @@ export interface BusWorker {
   subscribe (key: string, eventEmitter: NodeJS.EventEmitter, noAck: boolean): Promise<any>
   unsubscribe (subscriptionId: string): Promise<void>
   ack (msg): void
-  nack (msg): void
+  nack (msg, allUpTo, requeue): void
   request (options: RequestOptions): Promise<any>
   respond (res, msg): Promise<boolean>
 }

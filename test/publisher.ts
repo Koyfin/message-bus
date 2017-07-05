@@ -38,12 +38,13 @@ describe('publisher', function () {
       .then(_ch => {
         ch = _ch
         return _ch.assertExchange('fanout', 'fanout')
-          .then(() => _ch.assertExchange('direct', 'direct'))
-          .then(() => _ch.assertQueue(queue))
-          .then(() => _ch.bindQueue(queue, 'fanout', ''))
-          .then(() => _ch.bindQueue(queue, 'direct', 'direct'))
-          .then((q) => _ch.consume(queue, (msg) => handler(msg), {noAck: true}))
       })
+      .then(() => ch.assertExchange('direct', 'direct'))
+      .then(() => ch.assertQueue(queue))
+      .then(() => ch.purgeQueue(queue))
+      .then(() => ch.bindQueue(queue, 'fanout', ''))
+      .then(() => ch.bindQueue(queue, 'direct', 'direct'))
+      .then(() => ch.consume(queue, (msg) => handler(msg), {noAck: true}))
   })
 
   after('disconnect bus', function () {
@@ -52,6 +53,10 @@ describe('publisher', function () {
 
   after('close amqp connection', function () {
     return conn.close()
+  })
+
+  beforeEach('purge queue', function () {
+    return ch.purgeQueue(queue)
   })
 
   it(`publisher should publish msg to default exchange with "${queue}" key`, function (done) {

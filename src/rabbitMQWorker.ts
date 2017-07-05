@@ -53,9 +53,6 @@ export class RabbitMQWorker implements BusWorker {
         const content = RabbitMQWorker.getMessageContent(message)
         eventEmitter.emit(Events.MESSAGE, message, content)
       } catch (error) {
-        if (!noAck) {
-          this.nack(message)
-        }
         eventEmitter.emit(Events.ERROR, error, message)
       }
     }, options)
@@ -70,8 +67,8 @@ export class RabbitMQWorker implements BusWorker {
     return this._channel.ack(msg)
   }
 
-  nack (msg) {
-    return this._channel.nack(msg, false, false)
+  nack (msg, allUpTo, requeue) {
+    return this._channel.nack(msg, allUpTo, requeue)
   }
 
   request (options) {
