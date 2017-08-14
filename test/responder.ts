@@ -11,7 +11,7 @@ describe('responder', function () {
   const requesterQueue = 'requesterQueue'
   let bus: Bus
 
-  let defaultHandler = (msg): any => {
+  let defaultHandler = (): any => {
     throw new Error('replace default handler!')
   }
   let handler: (msg) => any
@@ -152,16 +152,53 @@ describe('responder', function () {
 
   it('responder should emit error event with message if invalid message received', function (done) {
     const content = 'invalid json'
-    responder = bus.responder('test')
+    responder = bus.responder(responderQueue)
     responder
-      .on(Events.ERROR, (error, message) => {
+      .on(Events.ERROR, (error, message, respond) => {
         expect(error instanceof Error).to.eq(true)
         expect(message.content.toString()).to.eq(content)
+        expect(typeof respond).to.eq('function')
         done()
       })
       .subscribe()
-      .then(() => ch.publish('', 'test', Buffer.from(content)))
+      .then(() => ch.publish('', responderQueue, Buffer.from(content)))
       .catch(done)
   })
 
+  it('responder should emit error event with message if there was an error in handler', function (done) {
+    const content = {some: 'val'}
+    responder = bus.responder(responderQueue)
+    responder
+      .on(Events.ROUTE_DEFAULT, () => {
+        throw new Error('test error')
+      })
+      .on(Events.ERROR, (error, message, respond) => {
+        expect(error instanceof Error).to.eq(true)
+        expect(JSON.parse(message.content.toString())).to.eql(content)
+        expect(typeof respond).to.eq('function')
+        done()
+      })
+      .subscribe()
+      .then(() => ch.publish('', responderQueue, Buffer.from(JSON.stringify(content))))
+      .catch(done)
+  })
+
+  it('responder should emit error event with message if there was an async error in handler', function (done) {
+    const content = {some: 'val'}
+    responder = bus.responder(responderQueue)
+    responder
+      .on(Events.ROUTE_DEFAULT, async () => {
+        // await Promise.resolve()
+        throw new Error('test error')
+      })
+      .on(Events.ERROR, (error, message, respond) => {
+        expect(error instanceof Error).to.eq(true)
+        expect(JSON.parse(message.content.toString())).to.eql(content)
+        expect(typeof respond).to.eq('function')
+        done()
+      })
+      .subscribe()
+      .then(() => ch.publish('', responderQueue, Buffer.from(JSON.stringify(content))))
+      .catch(done)
+  })
 })
