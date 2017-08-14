@@ -1,6 +1,6 @@
-import {Bus, Events} from '../src'
+import { Bus, Events } from '../src'
 import * as Bluebird from 'bluebird'
-import {expect} from 'chai'
+import { expect } from 'chai'
 import * as amqp from 'amqplib'
 import SubscriberBuilder from '../src/subscriberBuilder'
 

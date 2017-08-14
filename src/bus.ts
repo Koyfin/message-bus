@@ -1,16 +1,19 @@
 import PublisherBuilder from './publisherBuilder'
-import {RabbitMQWorker} from './rabbitMQWorker'
+import { RabbitMQWorker } from './rabbitMQWorker'
 import SubscriberBuilder from './subscriberBuilder'
 import RequesterBuilder from './requesterBuilder'
 import ResponderBuilder from './responderBuilder'
-import {BusWorker} from './types'
-import {Channel} from '@types/amqplib'
+import { BusWorker } from './types'
+// this import is needed for proper compilation
+// noinspection ES6UnusedImports
+import { Channel } from 'amqplib'
 
 export class Bus {
 
   private worker: BusWorker
   private options: object
 
+  // noinspection JSUnusedLocalSymbols
   private constructor (options: { worker: BusWorker }) {
     this.options = options
     this.worker = options.worker

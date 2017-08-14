@@ -1,5 +1,5 @@
-import {EventEmitter} from 'events'
-import {BusWorker} from './types'
+import { EventEmitter } from 'events'
+import { BusWorker } from './types'
 
 export default class SubscriberBuilder extends EventEmitter {
 
