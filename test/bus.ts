@@ -1,6 +1,6 @@
-import {Bus} from '../src'
+import { Bus } from '../src'
 import * as Bluebird from 'bluebird'
-import {expect} from 'chai'
+import { expect } from 'chai'
 import * as amqp from 'amqplib'
 
 describe('bus', function () {

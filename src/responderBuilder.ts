@@ -1,6 +1,6 @@
-import {EventEmitter} from 'events'
-import {Events} from './events'
-import {BusWorker} from './types'
+import { EventEmitter } from 'events'
+import { Events } from './events'
+import { BusWorker } from './types'
 
 export default class ResponderBuilder extends EventEmitter {
 
@@ -32,6 +32,27 @@ export default class ResponderBuilder extends EventEmitter {
     if (!this.subscriptionId) return
     this.eventEmitter.removeAllListeners()
     return this.worker.unsubscribe(this.subscriptionId)
+  }
+
+  // promise rejection support
+  // TODO: refactor responder to something like koa. Current solution is very kostyl-like
+  on (event: string | symbol, listener: Function) {
+
+    if (event === 'error') return super.on(event, listener)
+
+    super.on(event, async (...args) => {
+      // trying to support bus responses here
+      const hasMessage = args[0] && args[0].content
+      const message = hasMessage ? args[0] : undefined
+      const respond = hasMessage ? (res) => this.worker.respond(res, message) : undefined
+
+      try {
+        await listener(...args)
+      } catch (error) {
+        this.emit('error', error, message, respond)
+      }
+    })
+    return this
   }
 
   private createEventEmitter () {

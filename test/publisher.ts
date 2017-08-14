@@ -1,6 +1,6 @@
-import {Bus} from '../src'
+import { Bus } from '../src'
 import * as Bluebird from 'bluebird'
-import {expect} from 'chai'
+import { expect } from 'chai'
 import * as amqp from 'amqplib'
 
 describe('publisher', function () {
@@ -9,6 +9,7 @@ describe('publisher', function () {
   const queue = 'test'
   let bus: Bus
 
+  // noinspection JSUnusedLocalSymbols
   let handler = (msg): any => {
     throw new Error('replace default handler!')
   }

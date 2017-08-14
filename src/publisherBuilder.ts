@@ -1,4 +1,4 @@
-import {BusWorker} from './types'
+import { BusWorker } from './types'
 
 export default class PublisherBuilder {
 

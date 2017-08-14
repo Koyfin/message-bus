@@ -1,6 +1,6 @@
-import {Bus} from '../src'
+import { Bus } from '../src'
 import * as Bluebird from 'bluebird'
-import {expect} from 'chai'
+import { expect } from 'chai'
 import * as amqp from 'amqplib'
 
 describe('requester', function () {
@@ -9,6 +9,7 @@ describe('requester', function () {
   let bus: Bus
   let conn: amqp.Connection
   let ch: amqp.Channel
+  // noinspection JSUnusedLocalSymbols
   let handler: any = (msg) => {
     throw new Error('not implemented!')
   }
