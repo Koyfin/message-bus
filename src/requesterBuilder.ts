@@ -1,5 +1,5 @@
-import {BusWorker} from './types'
-import {Events} from './events'
+import { BusWorker } from './types'
+import { Events } from './events'
 
 export default class RequesterBuilder {
 
@@ -32,15 +32,18 @@ export default class RequesterBuilder {
     return this
   }
 
+  // noinspection JSUnusedGlobalSymbols
   timeout (): number
+  // noinspection JSUnusedGlobalSymbols
   timeout (timeout: number): this
+  // noinspection JSUnusedGlobalSymbols
   timeout (timeout?) {
     if (timeout === undefined) return this._timeout
     this._timeout = timeout
     return this
   }
 
-  async request (message: object, route = Events.ROUTE_DEFAULT ) {
+  async request (message: object, route = Events.ROUTE_DEFAULT) {
     const options = {
       key: this._key,
       exchange: this._exchange,

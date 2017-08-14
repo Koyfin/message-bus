@@ -1,9 +1,11 @@
 import * as uuid from 'uuid'
 import * as amqplib from 'amqplib'
-import {EventEmitter} from 'events'
-import {BusWorker} from './types'
-import {Events} from './events'
-import {Replies} from '@types/amqplib'
+import { EventEmitter } from 'events'
+import { BusWorker } from './types'
+import { Events } from './events'
+// this import is needed for proper compilation
+// noinspection ES6UnusedImports
+import { Replies } from 'amqplib'
 
 export class RabbitMQWorker implements BusWorker {
 

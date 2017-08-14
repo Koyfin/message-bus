@@ -1,6 +1,6 @@
-import {EventEmitter} from 'events'
-import {Events} from './events'
-import {BusWorker} from './types'
+import { EventEmitter } from 'events'
+import { Events } from './events'
+import { BusWorker } from './types'
 
 export default class ResponderBuilder extends EventEmitter {
 
