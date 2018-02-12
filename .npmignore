@@ -71,3 +71,4 @@ tsconfig.json
 tsconfig.base.json
 tslint.json
 .idea/
+./test.js

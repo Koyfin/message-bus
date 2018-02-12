@@ -1,7 +1,7 @@
 import * as amqp from 'amqplib'
 
 export interface BusWorker {
-  connect (options): Promise<void>
+  connect (url: string, options: IBusWorkerOptions): Promise<void>
   disconnect (): Promise<void>
   configure (cb: (channel) => Promise<any>): Promise<any>
   channel (): amqp.Channel
@@ -20,4 +20,14 @@ interface RequestOptions {
   timeout: number,
   route: string,
   message: object,
+}
+
+type channelType = 'regular' | 'confirm'
+
+interface IBusOptions {
+  channelType?: channelType
+}
+
+interface IBusWorkerOptions {
+  channelType?: channelType
 }
