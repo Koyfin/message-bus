@@ -1,7 +1,7 @@
 import * as uuid from 'uuid'
 import * as amqplib from 'amqplib'
 import { EventEmitter } from 'events'
-import { BusWorker } from './types'
+import { BusWorker, IBusWorkerOptions } from './types'
 import { Events } from './events'
 // this import is needed for proper compilation
 // noinspection ES6UnusedImports
@@ -20,11 +20,17 @@ export class RabbitMQWorker implements BusWorker {
     return JSON.parse(msg.content.toString())
   }
 
-  async connect (url: string) {
+  async connect (url, options: IBusWorkerOptions) {
     this.url = url
     //noinspection TsLint
     this.connection = await amqplib.connect(this.url)
-    this._channel = await this.connection.createChannel()
+    if (options.channelType === 'regular') {
+      this._channel = await this.connection.createChannel()
+    } else if (options.channelType === 'confirm') {
+      this._channel = await this.connection.createConfirmChannel()
+    } else {
+      throw new Error(`unsupported channelType option '${options.channelType}' provided`)
+    }
     await this.setupReplyQueue()
   }
 
@@ -82,7 +88,7 @@ export class RabbitMQWorker implements BusWorker {
       const correlationId = uuid.v4()
       const timeoutId = setTimeout(() => {
         this.responseEmitter.removeAllListeners(correlationId)
-        reject(new Error('todo: timeout'))
+        reject(new Error(`RPC response timeout, ${timeout} ms`))
       }, timeout)
 
       this.responseEmitter.once(correlationId, (msg) => {
