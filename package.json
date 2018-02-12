@@ -8,8 +8,8 @@
   },
   "license": "UNLICENSED",
   "author": {
-    "name": "EzeTech",
-    "url": "http://eze.tech/"
+    "name": "Koyfin",
+    "url": "https://koyfin.com/"
   },
   "main": "lib/index.js",
   "types": "lib/index",
@@ -25,13 +25,11 @@
     "test": "npm run tslint && mocha --compilers ts:ts-node/register",
     "test:docker": "docker-compose -f docker-compose.test.yml up --build",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "precommit": "npm run test"
   },
-  "pre-commit": [
-    "test"
-  ],
   "dependencies": {
-    "amqplib": "^0.5.1",
+    "amqplib": "^0.5.2",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
@@ -43,8 +41,8 @@
     "@types/sinon": "^2.2.2",
     "@types/uuid": "^2.0.29",
     "chai": "3.5.0",
+    "husky": "^0.14.3",
     "mocha": "3.2.0",
-    "pre-commit": "1.2.2",
     "sinon": "^2.3.1",
     "ts-node": "^3.0.4",
     "tslint": "^5.3.2",
@@ -55,6 +53,6 @@
     "fsevents": "*"
   },
   "engines": {
-    "node": ">=6.10"
+    "node": ">=8.9"
   }
 }

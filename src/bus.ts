@@ -3,7 +3,7 @@ import { RabbitMQWorker } from './rabbitMQWorker'
 import SubscriberBuilder from './subscriberBuilder'
 import RequesterBuilder from './requesterBuilder'
 import ResponderBuilder from './responderBuilder'
-import { BusWorker } from './types'
+import { BusWorker, IBusOptions } from './types'
 // this import is needed for proper compilation
 // noinspection ES6UnusedImports
 import { Channel } from 'amqplib'
@@ -19,9 +19,9 @@ export class Bus {
     this.worker = options.worker
   }
 
-  static async connect (url: string) {
+  static async connect (url: string, {channelType = 'regular'}: IBusOptions = {channelType: 'regular'}) {
     const bus = new Bus({worker: new RabbitMQWorker()})
-    await bus.worker.connect(url)
+    await bus.worker.connect(url, {channelType})
     return bus
   }
 
