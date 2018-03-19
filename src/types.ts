@@ -14,7 +14,7 @@ export interface BusWorker {
   respond (res, msg): Promise<boolean>
 }
 
-interface RequestOptions {
+export interface RequestOptions {
   key: string,
   exchange: string,
   timeout: number,
@@ -22,12 +22,12 @@ interface RequestOptions {
   message: object,
 }
 
-type channelType = 'regular' | 'confirm'
+export type channelType = 'regular' | 'confirm'
 
-interface IBusOptions {
+export interface IBusOptions {
   channelType?: channelType
 }
 
-interface IBusWorkerOptions {
+export interface IBusWorkerOptions {
   channelType?: channelType
 }
