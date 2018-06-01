@@ -24,13 +24,6 @@ export class RabbitMQWorker implements BusWorker {
     this.url = url
     //noinspection TsLint
     this.connection = await amqplib.connect(this.url)
-
-    // http://www.squaremobius.net/amqp.node/channel_api.html#model_events
-    // 'close' event triggered on 'error' also
-    this.connection.on('close', (e?) => {
-      throw e || new Error('connection closed')
-    })
-
     if (options.channelType === 'regular') {
       this._channel = await this.connection.createChannel()
     } else if (options.channelType === 'confirm') {
