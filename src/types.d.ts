@@ -1,11 +1,12 @@
 import * as amqp from 'amqplib'
+import { Options } from 'amqplib/properties';
 
 export interface BusWorker {
   connect (url: string, options: IBusWorkerOptions): Promise<void>
   disconnect (): Promise<void>
   configure (cb: (channel) => Promise<any>): Promise<any>
   channel (): amqp.Channel
-  publish (key: string, ex: string, message: object): Promise<any>
+  publish (key: string, ex: string, message: object, options?: Options.Publish): Promise<any>
   subscribe (key: string, eventEmitter: NodeJS.EventEmitter, noAck: boolean): Promise<any>
   unsubscribe (subscriptionId: string): Promise<void>
   ack (msg): void
