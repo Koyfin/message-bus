@@ -6,6 +6,7 @@ import { Events } from './events'
 // this import is needed for proper compilation
 // noinspection ES6UnusedImports
 import { Replies } from 'amqplib'
+import { Options } from 'amqplib/properties'
 
 export class RabbitMQWorker implements BusWorker {
 
@@ -46,7 +47,7 @@ export class RabbitMQWorker implements BusWorker {
     return this._channel
   }
 
-  async publish (key, exchange, message, options = {}) {
+  async publish (key, exchange, message, options?: Options.Publish) {
     if (!key && !exchange) {
       throw new Error(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
     }
