@@ -46,12 +46,12 @@ export class RabbitMQWorker implements BusWorker {
     return this._channel
   }
 
-  async publish (key, exchange, message) {
+  async publish (key, exchange, message, options = {}) {
     if (!key && !exchange) {
       throw new Error(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
     }
     const content = Buffer.from(JSON.stringify(message))
-    return this._channel.publish(exchange, key, content)
+    return this._channel.publish(exchange, key, content, options)
   }
 
   async subscribe (queue, eventEmitter: NodeJS.EventEmitter, noAck) {
