@@ -1,4 +1,5 @@
 import { BusWorker } from './types'
+import { Options } from 'amqplib/properties'
 
 export default class PublisherBuilder {
 
@@ -33,8 +34,8 @@ export default class PublisherBuilder {
 
   }
 
-  publish (message) {
-    return this.worker.publish(this._key, this._exchange, message)
+  publish (message, options?: Options.Publish) {
+    return this.worker.publish(this._key, this._exchange, message, options)
   }
 
 }
