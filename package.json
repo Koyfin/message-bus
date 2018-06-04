@@ -1,6 +1,6 @@
 {
   "name": "@koyfin/message-bus",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Usefull abstrations for rabbitmq",
   "homepage": "https://github.com/Koyfin/message-bus#readme",
   "bugs": {
@@ -21,7 +21,7 @@
     "url": "git+https://github.com/Koyfin/message-bus.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp ./src/types.d.ts ./lib/types.d.ts",
     "test": "npm run tslint && mocha --compilers ts:ts-node/register",
     "test:docker": "docker-compose -f docker-compose.test.yml up --build",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
