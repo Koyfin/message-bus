@@ -69,7 +69,7 @@ describe('requester', function () {
 
   })
 
-  it('responder should respond with request msg', function () {
+  it('responder should respond with request msg as buffer', function () {
     const requester = bus.requester('test')
     const testContent = {test: 'val'}
     const route = 'some route'
