@@ -50,7 +50,7 @@ export default class ResponderBuilder extends EventEmitter {
       // trying to support bus responses here
       const hasMessage = args[0] && args[0].content
       const message = hasMessage ? args[0] : undefined
-      const respond = hasMessage ? (res) => this.worker.respond(res, message) : undefined
+      const respond = hasMessage ? (res) => this.worker.respond(res, message, this._json) : undefined
 
       try {
         await listener(...args)
@@ -68,10 +68,10 @@ export default class ResponderBuilder extends EventEmitter {
       if (!this.listenerCount(route)) {
         route = Events.ROUTE_NOT_FOUND
       }
-      this.emit(route, message, content, (res) => this.worker.respond(res, message))
+      this.emit(route, message, content, (res) => this.worker.respond(res, message, this._json))
     })
     this.eventEmitter.on(Events.ERROR, (error, message) => {
-      this.emit(Events.ERROR, error, message, (res) => this.worker.respond(res, message))
+      this.emit(Events.ERROR, error, message, (res) => this.worker.respond(res, message, this._json))
     })
   }
 

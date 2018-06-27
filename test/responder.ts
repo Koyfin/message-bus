@@ -109,7 +109,7 @@ describe('responder', function () {
     responder
         .json(false)
         .on(route, (msg, content, respond) => {
-          return respond(JSON.parse(msg.content.toString()))
+          return respond(msg.content)
         })
         .subscribe()
         .then(() => {

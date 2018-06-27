@@ -16,7 +16,6 @@ export class RabbitMQWorker implements BusWorker {
   private _channel: amqplib.Channel
   private url: string
   private responseEmitter: NodeJS.EventEmitter
-  private _json: boolean = true
 
   private static getMessageContent (msg) {
     return JSON.parse(msg.content.toString())
@@ -108,9 +107,9 @@ export class RabbitMQWorker implements BusWorker {
     })
   }
 
-  async respond (res, msg) {
+  async respond (res, msg, json) {
     const {replyTo, correlationId} = msg.properties
-    const data = this._json ? Buffer.from(JSON.stringify(res)) : res.content
+    const data = json ? Buffer.from(JSON.stringify(res)) : res
     return this._channel.publish('', replyTo, data, {correlationId})
   }
 

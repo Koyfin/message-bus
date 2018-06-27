@@ -12,7 +12,7 @@ export interface BusWorker {
   ack (msg): void
   nack (msg, allUpTo, requeue): void
   request (options: RequestOptions): Promise<any>
-  respond (res, msg): Promise<boolean>
+  respond (res, msg, json): Promise<boolean>
 }
 
 interface RequestOptions {
