@@ -16,6 +16,7 @@ export class RabbitMQWorker implements BusWorker {
   private _channel: amqplib.Channel
   private url: string
   private responseEmitter: NodeJS.EventEmitter
+  private _json: boolean = true
 
   private static getMessageContent (msg) {
     return JSON.parse(msg.content.toString())
@@ -55,11 +56,12 @@ export class RabbitMQWorker implements BusWorker {
     return this._channel.publish(exchange, key, content, options)
   }
 
-  async subscribe (queue, eventEmitter: NodeJS.EventEmitter, noAck) {
+  async subscribe (queue, eventEmitter: NodeJS.EventEmitter, noAck, json?: boolean) {
+    this._json = json
     const options = {noAck}
     const {consumerTag} = await this._channel.consume(queue, (message) => {
       try {
-        const content = RabbitMQWorker.getMessageContent(message)
+        const content = this._json ? RabbitMQWorker.getMessageContent(message) : message
         eventEmitter.emit(Events.MESSAGE, message, content)
       } catch (error) {
         eventEmitter.emit(Events.ERROR, error, message)
@@ -81,7 +83,8 @@ export class RabbitMQWorker implements BusWorker {
   }
 
   request (options) {
-    const {key, exchange, timeout, route, message} = options
+    const {key, exchange, timeout, route, message, json} = options
+    this._json = json
     if (!key && !exchange) {
       return Promise.reject(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
     }
@@ -94,11 +97,12 @@ export class RabbitMQWorker implements BusWorker {
 
       this.responseEmitter.once(correlationId, (msg) => {
         clearTimeout(timeoutId)
-        const content = RabbitMQWorker.getMessageContent(msg)
+        const content = this._json ? RabbitMQWorker.getMessageContent(msg) : msg
         return resolve({msg, content})
       })
 
-      this._channel.publish(exchange, key, Buffer.from(JSON.stringify(message)), {
+      const data = this._json ? Buffer.from(JSON.stringify(message)) : message
+      this._channel.publish(exchange, key, data, {
         correlationId,
         replyTo: RabbitMQWorker.REPLY_QUEUE,
         type: route,
@@ -108,7 +112,8 @@ export class RabbitMQWorker implements BusWorker {
 
   async respond (res, msg) {
     const {replyTo, correlationId} = msg.properties
-    return this._channel.publish('', replyTo, Buffer.from(JSON.stringify(res)), {correlationId})
+    const data = this._json ? Buffer.from(JSON.stringify(res)) : res.content
+    return this._channel.publish('', replyTo, data, {correlationId})
   }
 
   private async setupReplyQueue () {

@@ -8,6 +8,7 @@ export default class ResponderBuilder extends EventEmitter {
   private _key: string
   private eventEmitter: EventEmitter
   private subscriptionId: string
+  private _json: boolean = true
 
   constructor (worker: BusWorker, key) {
     super()
@@ -24,8 +25,13 @@ export default class ResponderBuilder extends EventEmitter {
     return this
   }
 
+  json (json: boolean) {
+    this._json = json
+    return this
+  }
+
   async subscribe () {
-    this.subscriptionId = await this.worker.subscribe(this._key, this.eventEmitter, true)
+    this.subscriptionId = await this.worker.subscribe(this._key, this.eventEmitter, true, this._json)
   }
 
   async unsubscribe () {

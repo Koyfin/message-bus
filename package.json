@@ -21,11 +21,14 @@
     "url": "git+https://github.com/Koyfin/message-bus.git"
   },
   "scripts": {
-    "build": "tsc && cp ./src/types.d.ts ./lib/types.d.ts",
+    "build": "tsc --noEmit false && cp ./src/types.d.ts ./lib/types.d.ts",
     "test": "npm run tslint && mocha --compilers ts:ts-node/register",
     "test:docker": "docker-compose -f docker-compose.test.yml up --build",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "watch": "tsc -w",
+    "tsc": "tsc -p .",
+    "tsc:withEmit": "tsc --noEmit false -p .",
+    "tsc:clean": "find ./src ./test -type f -name '*.js' -delete && find ./src ./test -type f -name '*.js.map' -delete",
+    "watch2": "tsc -w",
     "precommit": "npm run test"
   },
   "dependencies": {

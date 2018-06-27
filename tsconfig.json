@@ -3,7 +3,8 @@
   "compilerOptions": {
     "sourceMap": true,
     "outDir": "lib",
-    "declaration": true
+    "declaration": true,
+    "noEmit": true
   },
   "files": [
     "src/index.ts"

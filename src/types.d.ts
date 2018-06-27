@@ -7,7 +7,7 @@ export interface BusWorker {
   configure (cb: (channel) => Promise<any>): Promise<any>
   channel (): amqp.Channel
   publish (key: string, ex: string, message: object, options?: Options.Publish): Promise<any>
-  subscribe (key: string, eventEmitter: NodeJS.EventEmitter, noAck: boolean): Promise<any>
+  subscribe (key: string, eventEmitter: NodeJS.EventEmitter, noAck: boolean, json?: boolean): Promise<any>
   unsubscribe (subscriptionId: string): Promise<void>
   ack (msg): void
   nack (msg, allUpTo, requeue): void

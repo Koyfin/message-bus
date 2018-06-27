@@ -69,4 +69,22 @@ describe('requester', function () {
 
   })
 
+  it('responder should respond with request msg', function () {
+    const requester = bus.requester('test')
+    const testContent = {test: 'val'}
+    const route = 'some route'
+
+    handler = (msg) => {
+      expect(msg.properties.type).to.eq(route)
+      return ch.publish('', msg.properties.replyTo, msg.content, {correlationId: msg.properties.correlationId})
+    }
+
+    return requester
+        .json(false)
+        .request(Buffer.from(JSON.stringify(testContent)), route)
+        .then(({content}) => {
+          expect(JSON.parse(content.content.toString())).to.eql(testContent)
+        })
+  })
+
 })
