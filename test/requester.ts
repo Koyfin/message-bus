@@ -83,7 +83,7 @@ describe('requester', function () {
         .json(false)
         .request(Buffer.from(JSON.stringify(testContent)), route)
         .then(({content}) => {
-          expect(JSON.parse(content.content.toString())).to.eql(testContent)
+          expect(JSON.parse(content.toString())).to.eql(testContent)
         })
   })
 

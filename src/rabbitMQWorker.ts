@@ -59,7 +59,7 @@ export class RabbitMQWorker implements BusWorker {
     const options = {noAck}
     const {consumerTag} = await this._channel.consume(queue, (message) => {
       try {
-        const content = json ? RabbitMQWorker.getMessageContent(message) : message
+        const content = json ? RabbitMQWorker.getMessageContent(message) : message.content
         eventEmitter.emit(Events.MESSAGE, message, content)
       } catch (error) {
         eventEmitter.emit(Events.ERROR, error, message)
@@ -94,7 +94,7 @@ export class RabbitMQWorker implements BusWorker {
 
       this.responseEmitter.once(correlationId, (msg) => {
         clearTimeout(timeoutId)
-        const content = json ? RabbitMQWorker.getMessageContent(msg) : msg
+        const content = json ? RabbitMQWorker.getMessageContent(msg) : msg.content
         return resolve({msg, content})
       })
 
