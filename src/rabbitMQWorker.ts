@@ -57,11 +57,10 @@ export class RabbitMQWorker implements BusWorker {
   }
 
   async subscribe (queue, eventEmitter: NodeJS.EventEmitter, noAck, json?: boolean) {
-    this._json = json
     const options = {noAck}
     const {consumerTag} = await this._channel.consume(queue, (message) => {
       try {
-        const content = this._json ? RabbitMQWorker.getMessageContent(message) : message
+        const content = json ? RabbitMQWorker.getMessageContent(message) : message
         eventEmitter.emit(Events.MESSAGE, message, content)
       } catch (error) {
         eventEmitter.emit(Events.ERROR, error, message)
@@ -84,7 +83,6 @@ export class RabbitMQWorker implements BusWorker {
 
   request (options) {
     const {key, exchange, timeout, route, message, json} = options
-    this._json = json
     if (!key && !exchange) {
       return Promise.reject(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
     }
@@ -97,11 +95,11 @@ export class RabbitMQWorker implements BusWorker {
 
       this.responseEmitter.once(correlationId, (msg) => {
         clearTimeout(timeoutId)
-        const content = this._json ? RabbitMQWorker.getMessageContent(msg) : msg
+        const content = json ? RabbitMQWorker.getMessageContent(msg) : msg
         return resolve({msg, content})
       })
 
-      const data = this._json ? Buffer.from(JSON.stringify(message)) : message
+      const data = json ? Buffer.from(JSON.stringify(message)) : message
       this._channel.publish(exchange, key, data, {
         correlationId,
         replyTo: RabbitMQWorker.REPLY_QUEUE,

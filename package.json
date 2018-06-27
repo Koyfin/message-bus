@@ -28,8 +28,9 @@
     "tsc": "tsc -p .",
     "tsc:withEmit": "tsc --noEmit false -p .",
     "tsc:clean": "find ./src ./test -type f -name '*.js' -delete && find ./src ./test -type f -name '*.js.map' -delete",
-    "watch2": "tsc -w",
-    "precommit": "npm run test"
+    "watch": "tsc -w",
+    "precommit": "npm run test",
+    "prepublishOnly": "npm run test && npm run build"
   },
   "dependencies": {
     "amqplib": "^0.5.2",
