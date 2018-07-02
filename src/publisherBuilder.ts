@@ -6,6 +6,7 @@ export default class PublisherBuilder {
   private worker: BusWorker
   private _key: string
   private _exchange: string
+  private _json: boolean = true
 
   constructor (worker: BusWorker, key, ex) {
     this.worker = worker
@@ -34,8 +35,13 @@ export default class PublisherBuilder {
 
   }
 
+  json (json: boolean) {
+    this._json = json
+    return this
+  }
+
   publish (message, options?: Options.Publish) {
-    return this.worker.publish(this._key, this._exchange, message, options)
+    return this.worker.publish(this._key, this._exchange, message, options, this._json)
   }
 
 }
