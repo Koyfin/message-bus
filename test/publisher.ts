@@ -96,4 +96,16 @@ describe('publisher', function () {
 
   })
 
+  it(`publisher should publish msg without convertation to JSON`, function (done) {
+    const testContent = {test: 'buffer'}
+    const publisher = bus.publisher('direct', 'direct')
+    handler = (msg) => {
+      expect(msg.content).eql(Buffer.from(JSON.stringify(testContent)))
+      done()
+    }
+    publisher.json(false).publish(Buffer.from(JSON.stringify(testContent)))
+        .catch(done)
+
+  })
+
 })

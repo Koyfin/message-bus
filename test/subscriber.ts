@@ -61,8 +61,26 @@ describe('subscriber', function () {
     subscriber = bus.subscriber('test')
     const testContent = {test: 'val'}
     subscriber
+      .json(true)
       .on(Events.MESSAGE, (message, content) => {
         expect(content).to.eql(testContent)
+        bus.ack(message)
+        done()
+      })
+      .subscribe()
+      .then(() => {
+        return ch.publish('', 'test', Buffer.from(JSON.stringify(testContent)))
+      })
+
+  })
+
+  it('subscriber should receive published msg as buffer', function (done) {
+    subscriber = bus.subscriber('test')
+    const testContent = {test: 'val'}
+    subscriber
+      .json(false)
+      .on(Events.MESSAGE, (message, content) => {
+        expect(JSON.parse(message.content.toString())).to.eql(testContent)
         bus.ack(message)
         done()
       })

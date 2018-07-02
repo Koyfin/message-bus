@@ -93,6 +93,34 @@ describe('responder', function () {
 
   })
 
+  it('responder should respond with request msg as buffer', function (done) {
+    const replyTo = requesterQueue
+    const correlationId = 'correlationId'
+    const testContent = {test: 'val'}
+    const route = 'some-route'
+    responder = bus.responder(responderQueue)
+
+    handler = (msg) => {
+      const content = JSON.parse(msg.content.toString())
+      expect(content).eql(testContent)
+      done()
+    }
+
+    responder
+        .json(false)
+        .on(route, (msg, content, respond) => {
+          return respond(msg.content)
+        })
+        .subscribe()
+        .then(() => {
+          return ch.publish('', responderQueue, Buffer.from(JSON.stringify(testContent)), {
+            replyTo,
+            correlationId,
+            type: route,
+          })
+        })
+  })
+
   it('responder should respond with "" route', function (done) {
     const replyTo = requesterQueue
     const correlationId = 'correlationId'

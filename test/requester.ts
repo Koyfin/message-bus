@@ -69,4 +69,41 @@ describe('requester', function () {
 
   })
 
+  it('responder should respond with request msg as buffer', function () {
+    const requester = bus.requester('test')
+    const testContent = {test: 'val'}
+    const route = 'some route'
+
+    handler = (msg) => {
+      expect(msg.properties.type).to.eq(route)
+      return ch.publish('', msg.properties.replyTo, msg.content, {correlationId: msg.properties.correlationId})
+    }
+
+    return requester
+        .json(false)
+        .request(Buffer.from(JSON.stringify(testContent)), route)
+        .then(({content}) => {
+          expect(JSON.parse(content.toString())).to.eql(testContent)
+        })
+  })
+
+  it('two responders have to work correctly with json and buffer', async function () {
+    const requester = bus.requester('test')
+    const jsonRequester = bus.requester('test')
+    const testContent = {test: 'val'}
+    const jsonContent = {json: true}
+    const route = 'some route'
+    const jsonRoute = 'json route'
+
+    handler = (msg) => {
+      return ch.publish('', msg.properties.replyTo, msg.content, {correlationId: msg.properties.correlationId})
+    }
+
+    const {content} = await requester.json(false).request(Buffer.from(JSON.stringify(testContent)), route)
+    expect(JSON.parse(content.toString())).to.eql(testContent)
+
+    const jsonResponse = await jsonRequester.json(true).request(jsonContent, jsonRoute)
+    expect(jsonResponse.content).to.eql(jsonContent)
+  })
+
 })

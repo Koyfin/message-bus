@@ -7,6 +7,7 @@ export default class SubscriberBuilder extends EventEmitter {
   private _key: string
   private _noAck: boolean
   private subscriptionId: string
+  private _json: boolean = true
 
   constructor (worker: BusWorker, key) {
 
@@ -33,8 +34,13 @@ export default class SubscriberBuilder extends EventEmitter {
     return this
   }
 
+  json (json: boolean) {
+    this._json = json
+    return this
+  }
+
   async subscribe () {
-    this.subscriptionId = await this.worker.subscribe(this._key, this, this._noAck)
+    this.subscriptionId = await this.worker.subscribe(this._key, this, this._noAck, this._json)
   }
 
   async unsubscribe () {

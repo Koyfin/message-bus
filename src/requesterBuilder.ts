@@ -8,6 +8,7 @@ export default class RequesterBuilder {
   private _key: string
   private _exchange: string
   private _timeout: number
+  private _json: boolean = true
 
   constructor (worker: BusWorker, key, ex = '') {
     this.worker = worker
@@ -32,6 +33,11 @@ export default class RequesterBuilder {
     return this
   }
 
+  json (json: boolean) {
+    this._json = json
+    return this
+  }
+
   // noinspection JSUnusedGlobalSymbols
   timeout (): number
   // noinspection JSUnusedGlobalSymbols
@@ -50,6 +56,7 @@ export default class RequesterBuilder {
       timeout: this._timeout,
       route,
       message,
+      json: this._json,
     }
     return this.worker.request(options)
   }

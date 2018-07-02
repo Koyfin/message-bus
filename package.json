@@ -1,6 +1,6 @@
 {
   "name": "@koyfin/message-bus",
-  "version": "0.1.10",
+  "version": "0.2.0",
   "description": "Usefull abstrations for rabbitmq",
   "homepage": "https://github.com/Koyfin/message-bus#readme",
   "bugs": {
@@ -21,12 +21,16 @@
     "url": "git+https://github.com/Koyfin/message-bus.git"
   },
   "scripts": {
-    "build": "tsc && cp ./src/types.d.ts ./lib/types.d.ts",
+    "build": "tsc --noEmit false && cp ./src/types.d.ts ./lib/types.d.ts",
     "test": "npm run tslint && mocha --compilers ts:ts-node/register",
     "test:docker": "docker-compose -f docker-compose.test.yml up --build",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "tsc": "tsc -p .",
+    "tsc:withEmit": "tsc --noEmit false -p .",
+    "tsc:clean": "find ./src ./test -type f -name '*.js' -delete && find ./src ./test -type f -name '*.js.map' -delete",
     "watch": "tsc -w",
-    "precommit": "npm run test"
+    "precommit": "npm run test",
+    "prepublishOnly": "npm run test && npm run build"
   },
   "dependencies": {
     "amqplib": "^0.5.2",
