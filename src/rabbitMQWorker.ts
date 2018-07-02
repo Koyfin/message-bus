@@ -47,15 +47,11 @@ export class RabbitMQWorker implements BusWorker {
     return this._channel
   }
 
-  async publish (key, exchange, message, options?: Options.Publish, toJson?: boolean ) {
-    if (toJson === undefined) {
-      toJson = true
-    }
-
+  async publish (key, exchange, message, options?: Options.Publish, toJson = true ) {
     if (!key && !exchange) {
       throw new Error(`please specify key or exchange. key="${key}" exchange="${exchange}"`)
     }
-    const content = (toJson) ? Buffer.from(JSON.stringify(message)) : message
+    const content = toJson ? Buffer.from(JSON.stringify(message)) : message
     return this._channel.publish(exchange, key, content, options)
   }
 
