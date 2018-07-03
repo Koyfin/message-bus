@@ -5,8 +5,7 @@ import { BusWorker, IBusWorkerOptions } from './types'
 import { Events } from './events'
 // this import is needed for proper compilation
 // noinspection ES6UnusedImports
-import { Replies } from 'amqplib'
-import { Options } from 'amqplib/properties'
+import { Options, Message } from 'amqplib/properties'
 
 export class RabbitMQWorker implements BusWorker {
 
@@ -107,10 +106,11 @@ export class RabbitMQWorker implements BusWorker {
     })
   }
 
-  async respond (res, msg, json) {
+  async respond (res: any, msg: Message, json: boolean, options?: Options.Publish) {
     const {replyTo, correlationId} = msg.properties
+    options = Object.assign({}, options || {}, {correlationId})
     const data = json ? Buffer.from(JSON.stringify(res)) : res
-    return this._channel.publish('', replyTo, data, {correlationId})
+    return this._channel.publish('', replyTo, data, options)
   }
 
   private async setupReplyQueue () {

@@ -46,17 +46,17 @@ Bus.connect(url)
   responder
     .on(route, (msg, content, respond) => {
       console.log('responding on ', content) // parsed message content
-      return respond(msg)
+      return respond(msg, {headers: {statusCode: 200}}) // respond with optional msg properties
     })
     // if route not specified
     .on(Events.ROUTE_DEFAULT, (msg, content, respond) => {
       console.log('responding on ', content) // parsed message content
-      return respond(msg)
+      return respond(msg, {headers: {statusCode: 200}}) // respond with optional msg properties
     })
     // fallback, if no handlers found for given route
     .on(Events.ROUTE_NOT_FOUND, (msg, content, respond) => {
       console.log('responding on ', content) // parsed message content
-      return respond(msg)
+      return respond(msg, {headers: {statusCode: 200}}) // respond with optional msg properties
     })
     .on(Events.ERROR, error => console.error(error))
     

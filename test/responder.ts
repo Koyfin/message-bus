@@ -90,7 +90,6 @@ describe('responder', function () {
           type: route,
         })
       })
-
   })
 
   it('responder should respond with request msg as buffer', function (done) {
@@ -107,18 +106,18 @@ describe('responder', function () {
     }
 
     responder
-        .json(false)
-        .on(route, (msg, content, respond) => {
-          return respond(msg.content)
+      .json(false)
+      .on(route, (msg, content, respond) => {
+        return respond(msg.content)
+      })
+      .subscribe()
+      .then(() => {
+        return ch.publish('', responderQueue, Buffer.from(JSON.stringify(testContent)), {
+          replyTo,
+          correlationId,
+          type: route,
         })
-        .subscribe()
-        .then(() => {
-          return ch.publish('', responderQueue, Buffer.from(JSON.stringify(testContent)), {
-            replyTo,
-            correlationId,
-            type: route,
-          })
-        })
+      })
   })
 
   it('responder should respond with "" route', function (done) {
@@ -228,5 +227,48 @@ describe('responder', function () {
       .subscribe()
       .then(() => ch.publish('', responderQueue, Buffer.from(JSON.stringify(content))))
       .catch(done)
+  })
+
+  it('responder should respond with specified msg properties', function (done) {
+    const replyTo = requesterQueue
+    const correlationId = 'correlationId'
+    const testContent = {test: 'val'}
+    const route = 'some-route'
+    responder = bus.responder(responderQueue)
+
+    handler = (msg) => {
+      expect(msg.properties).eql({
+        'appId': undefined,
+        'clusterId': undefined,
+        'contentEncoding': undefined,
+        'contentType': undefined,
+        'correlationId': 'correlationId',
+        'deliveryMode': undefined,
+        'expiration': undefined,
+        'headers': {
+          'some': 'value',
+        },
+        'messageId': undefined,
+        'priority': undefined,
+        'replyTo': undefined,
+        'timestamp': undefined,
+        'type': undefined,
+        'userId': undefined,
+      })
+      done()
+    }
+
+    responder
+      .on(route, (msg, content, respond) => {
+        return respond(content, {headers: {some: 'value'}})
+      })
+      .subscribe()
+      .then(() => {
+        return ch.publish('', responderQueue, Buffer.from(JSON.stringify(testContent)), {
+          replyTo,
+          correlationId,
+          type: route,
+        })
+      })
   })
 })

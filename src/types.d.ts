@@ -1,5 +1,5 @@
 import * as amqp from 'amqplib'
-import { Options } from 'amqplib/properties';
+import { Options, Message } from 'amqplib/properties';
 
 export interface BusWorker {
   connect (url: string, options: IBusWorkerOptions): Promise<void>
@@ -12,7 +12,7 @@ export interface BusWorker {
   ack (msg): void
   nack (msg, allUpTo, requeue): void
   request (options: RequestOptions): Promise<any>
-  respond (res, msg, json): Promise<boolean>
+  respond (res: any, msg: Message, json: boolean, options: Options.Publish): Promise<boolean>
 }
 
 interface RequestOptions {
