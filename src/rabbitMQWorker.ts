@@ -23,7 +23,7 @@ export class RabbitMQWorker implements BusWorker {
   async connect (url, options: IBusWorkerOptions) {
     this.url = url
     //noinspection TsLint
-    this.connection = await amqplib.connect(this.url)
+    this.connection = await amqplib.connect(this.url, options.socketOptions)
     if (options.channelType === 'regular') {
       this._channel = await this.connection.createChannel()
     } else if (options.channelType === 'confirm') {

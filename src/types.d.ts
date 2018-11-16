@@ -26,9 +26,11 @@ interface RequestOptions {
 type channelType = 'regular' | 'confirm'
 
 interface IBusOptions {
-  channelType?: channelType
+  channelType?: channelType,
+  socketOptions?: any
 }
 
 interface IBusWorkerOptions {
-  channelType?: channelType
+  channelType?: channelType,
+  socketOptions?: any
 }
