@@ -19,9 +19,9 @@ export class Bus {
     this.worker = options.worker
   }
 
-  static async connect (url: string, {channelType = 'regular'}: IBusOptions = {channelType: 'regular'}) {
+  static async connect (url: string, {channelType = 'regular', socketOptions}: IBusOptions = {channelType: 'regular'}) {
     const bus = new Bus({worker: new RabbitMQWorker()})
-    await bus.worker.connect(url, {channelType})
+    await bus.worker.connect(url, {channelType, socketOptions})
     return bus
   }
 
