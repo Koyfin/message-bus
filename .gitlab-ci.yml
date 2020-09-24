@@ -1,0 +1,4 @@
+# https://gitlab.com/koyfin/infra/ci_templates/-/blob/master/.gitlab/npm-workflow/.gitlab-ci.yml
+include:
+- project: koyfin/infra/ci_templates
+  file: .gitlab/npm-workflow/.gitlab-ci.yml
